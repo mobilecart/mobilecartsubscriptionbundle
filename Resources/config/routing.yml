@@ -1,0 +1,79 @@
+cart_admin_subscription:
+    path: /admin/subscription/
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:index' }
+    methods: [GET]
+
+cart_admin_subscription_create:
+    path: /admin/subscription/
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:create' }
+    methods: [POST]
+
+cart_admin_subscription_new:
+    path: /admin/subscription/new
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:new' }
+    methods: [GET]
+
+cart_admin_subscription_show:
+    path: '/admin/subscription/{id}'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:show' }
+    methods: [GET]
+
+cart_admin_subscription_edit:
+    path: '/admin/subscription/{id}/edit'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:edit' }
+    methods: [GET]
+
+cart_admin_subscription_update:
+    path: '/admin/subscription/{id}'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:update' }
+    methods: [PUT]
+
+cart_admin_subscription_delete:
+    path: '/admin/subscription/{id}'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:delete' }
+    methods: [DELETE]
+
+cart_admin_subscription_mass_delete:
+    path: /admin/subscription/mass_delete
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:massDelete' }
+    methods: [POST]
+
+cart_admin_subscription_customer:
+    path: /admin/subscription_customer/
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:index' }
+    methods: [GET]
+
+cart_admin_subscription_customer_create:
+    path: /admin/subscription_customer/
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:create' }
+    methods: [POST]
+
+cart_admin_subscription_customer_new:
+    path: /admin/subscription_customer/new
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:new' }
+    methods: [GET]
+
+cart_admin_subscription_customer_show:
+    path: '/admin/subscription_customer/{id}'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:show' }
+    methods: [GET]
+
+cart_admin_subscription_customer_edit:
+    path: '/admin/subscription_customer/{id}/edit'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:edit' }
+    methods: [GET]
+
+cart_admin_subscription_customer_update:
+    path: '/admin/subscription_customer/{id}'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:update' }
+    methods: [PUT]
+
+cart_admin_subscription_customer_delete:
+    path: '/admin/subscription_customer/{id}'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:delete' }
+    methods: [DELETE]
+
+cart_admin_subscription_customer_mass_delete:
+    path: /admin/subscription_customer/mass_delete
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:massDelete' }
+    methods: [POST]

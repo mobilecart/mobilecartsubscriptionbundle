@@ -1,0 +1,10 @@
+{% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
+{% block header_text %}Edit Subscription Customer{% endblock %}
+{% block subheader_text %}Name: {{ entity.get('customer_name') }}{% endblock %}
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_subscription_customer') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
+{% endblock %}
