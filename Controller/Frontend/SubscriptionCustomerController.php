@@ -49,7 +49,7 @@ class SubscriptionCustomerController extends Controller
             ->setSection(CoreEvent::SECTION_FRONTEND);
 
         $this->get('event_dispatcher')
-            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_LIST, $event);
+            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_FRONTEND_LIST, $event);
 
         return $event->getResponse();
     }

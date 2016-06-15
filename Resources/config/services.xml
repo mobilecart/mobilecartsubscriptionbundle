@@ -22,6 +22,7 @@
 
         <parameter key="cart.listener.subscription_customer.search.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerSearch</parameter>
         <parameter key="cart.listener.subscription_customer.list.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerList</parameter>
+        <parameter key="cart.listener.subscription_customer.frontend.list.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerFrontendList</parameter>
         <parameter key="cart.listener.subscription_customer.edit.return.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerEditReturn</parameter>
         <parameter key="cart.listener.subscription_customer.new.return.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerNewReturn</parameter>
         <parameter key="cart.listener.subscription_customer.create.return.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerCreateReturn</parameter>
@@ -283,6 +284,18 @@
             <tag name="kernel.event_listener" event="subscription_customer.add.success" method="onSubscriptionCustomerAddSuccess" priority="50" />
             <call method="setThemeService">
                 <argument type="service" id="cart.theme"/>
+            </call>
+        </service>
+        <service id="cart.listener.subscription_customer.frontend.list" lazy="true" class="%cart.listener.subscription_customer.frontend.list.class%">
+            <tag name="kernel.event_listener" event="subscription_customer.frontend.list" method="onSubscriptionCustomerFrontendList" priority="50" />
+            <call method="setRouter">
+                <argument type="service" id="router"/>
+            </call>
+            <call method="setThemeService">
+                <argument type="service" id="cart.theme"/>
+            </call>
+            <call method="setEntityService">
+                <argument type="service" id="cart.entity"/>
             </call>
         </service>
     </services>

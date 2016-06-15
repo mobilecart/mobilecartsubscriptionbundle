@@ -1,0 +1,34 @@
+{% extends frontend() %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable">
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+                {% if entities|length == 0 %}
+                    <tr>
+                        <td colspan="3">
+                            None found
+                        </td>
+                    </tr>
+                {% else %}
+                    {% for entity in entities %}
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>{{ entity.name }}</td>
+                            <td>{{ entity.email }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

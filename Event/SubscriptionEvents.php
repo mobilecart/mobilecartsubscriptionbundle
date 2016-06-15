@@ -18,6 +18,7 @@ class SubscriptionEvents
     const SUBSCRIPTION_ADMIN_FORM = 'subscription.admin.form';
 
     const SUBSCRIPTION_CUSTOMER_LIST = 'subscription_customer.list';
+    const SUBSCRIPTION_CUSTOMER_FRONTEND_LIST = 'subscription_customer.frontend.list';
     const SUBSCRIPTION_CUSTOMER_SEARCH = 'subscription_customer.search';
     const SUBSCRIPTION_CUSTOMER_UPDATE = 'subscription_customer.update';
     const SUBSCRIPTION_CUSTOMER_INSERT = 'subscription_customer.insert';
