@@ -1,0 +1,23 @@
+{
+    "name": "mobilecart/subscriptionbundle",
+    "autoload": {
+        "psr-4" : {
+            "MobileCart\\SubscriptionBundle\\" : ""
+        }
+    },
+    "type": "symfony-bundle",
+    "description": "Subscription Management for Mobile Cart",
+    "keywords": ["shopping", "cart", "e-commerce", "payment", "subscription"],
+    "homepage": "http://mobilecart.io",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Jesse Hanson",
+            "email": "jesse@mobilecart.io"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.24",
+        "symfony/framework-bundle": "~2.8"
+    }
+}
