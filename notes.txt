@@ -1,0 +1,11 @@
+ADD THIS TO YOUR ADMIN-LAYOUT
+
+
+<li>
+                <a href="#"><i class="glyphicon glyphicon-calendar"></i> &nbsp;Subscriptions<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li><a href="{{ path('cart_admin_subscription') }}">Subscriptions</a></li>
+                    <li><a href="{{ path('cart_admin_subscription_customer') }}">Customers</a></li>
+                    <li><a href="#">Payments</a></li>
+                </ul>
+            </li>

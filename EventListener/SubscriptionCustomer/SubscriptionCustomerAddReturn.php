@@ -3,6 +3,7 @@
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SubscriptionCustomerAddReturn
 {
@@ -95,23 +96,41 @@ class SubscriptionCustomerAddReturn
     {
         $this->setEvent($event);
         $returnData = $this->getReturnData();
+        $request = $event->getRequest();
+        $format = $request->get('format', '');
 
         $entity = $event->getEntity();
         $varSet = $this->getVarSet();
         $objectType = $event->getObjectType();
 
-        $typeSections = [];
+        switch($format) {
+            case 'json':
+                $response = new JsonResponse([
+                    'success' => 0,
+                ]);
 
-        $returnData['template_sections'] = $typeSections;
+                $event->setResponse($response);
+                break;
+            default:
 
-        $form = $returnData['form'];
-        $returnData['form'] = $form->createView();
-        $returnData['entity'] = $entity;
+                $typeSections = [];
 
-        $response = $this->getThemeService()
-            ->render('subscription_frontend', 'SubscriptionCustomer:add.html.twig', $returnData);
+                $returnData['template_sections'] = $typeSections;
 
-        $event->setResponse($response);
+                $form = $returnData['form'];
+                $returnData['form'] = $form->createView();
+                $returnData['entity'] = $entity;
+
+                $response = $this->getThemeService()
+                    ->render('subscription_frontend', 'SubscriptionCustomer:add.html.twig', $returnData);
+
+                $event->setResponse($response);
+
+                break;
+        }
+
+
+
         $event->setReturnData($returnData);
     }
 }
