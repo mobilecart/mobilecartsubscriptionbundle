@@ -31,6 +31,7 @@ class SubscriptionCustomerRepository
         return [
             'id' => 'ID',
             'customer_name' => 'Customer Name',
+            'email' => 'Email', // including customer.email because we join tables in SubscriptionCustomerSearch
         ];
     }
 

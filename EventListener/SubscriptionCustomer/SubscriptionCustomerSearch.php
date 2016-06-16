@@ -2,6 +2,7 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
+use MobileCart\CoreBundle\Constants\EntityConstants;
 use Symfony\Component\EventDispatcher\Event;
 
 class SubscriptionCustomerSearch
@@ -33,7 +34,10 @@ class SubscriptionCustomerSearch
 
         $search = $event->getSearch()
             ->setObjectType($event->getObjectType()) // Important: set this first
-            ->parseRequest($event->getRequest());
+            ->parseRequest($event->getRequest())
+            ->addJoin('inner', EntityConstants::CUSTOMER, 'id', 'customer_id')
+            ->addColumn(EntityConstants::CUSTOMER . '.email')
+            ;
 
         $returnData['search'] = $search;
         $returnData['result'] = $search->search();

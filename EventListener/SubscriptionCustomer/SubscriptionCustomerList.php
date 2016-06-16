@@ -91,6 +91,11 @@ class SubscriptionCustomerList
                 'label' => 'Customer Name',
                 'sort' => 1,
             ],
+            [
+                'key' => 'email',
+                'label' => 'Email',
+                'sort' => 1,
+            ],
         ];
 
         switch($format) {
