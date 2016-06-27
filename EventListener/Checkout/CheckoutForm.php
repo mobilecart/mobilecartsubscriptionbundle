@@ -166,12 +166,18 @@ class CheckoutForm
             if ($extPlanId) {
                 $event->setExternalPlanId($extPlanId);
                 $paymentMethodRequest->setExternalPlanId($extPlanId);
+                $email = $this->getCheckoutSessionService()
+                    ->getCartSessionService()
+                    ->getCustomer()
+                    ->getEmail();
 
                 if (!isset($returnData['payment_data'])) {
                     $returnData['payment_data'] = [];
                 }
 
+                // this is handled in CheckoutSubmitOrder
                 $returnData['payment_data']['external_plan_id'] = $extPlanId;
+                $returnData['payment_data']['email'] = $email;
             }
 
             $event->setCollectPaymentMethodRequest($paymentMethodRequest);

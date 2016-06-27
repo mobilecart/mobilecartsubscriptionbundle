@@ -8,7 +8,9 @@ use Symfony\Component\EventDispatcher\Event;
 
 class AddProduct
 {
-    public $entityService;
+    protected $entityService;
+
+    protected $cartSessionService;
 
     protected $event;
 
@@ -57,6 +59,28 @@ class AddProduct
                 $subscription = $this->getEntityService()->find(EntityConstants::SUBSCRIPTION, $cartItem->getSubscriptionId());
                 if ($subscription) {
                     $cartItem->setSubscription(new ArrayWrapper($subscription->getData()));
+                    $removed = false;
+                    foreach($cart->getItems() as $item) {
+                        if ($item->getProductId() != $productId) {
+                            $cart->removeProductId($productId); // todo : add a config option for this
+                            $removed = true;
+                        }
+                    }
+
+                    if ($removed) {
+
+                        $cart = $this->getCartSessionService()
+                            ->collectShippingMethods()
+                            ->collectTotals()
+                            ->getCart();
+
+                        $cartEntity = $event->getCartEntity();
+
+                        // update db
+                        $cartEntity->setJson($cart->toJson());
+                        $this->getEntityService()->persist($cartEntity);
+                        $returnData['cart'] = $cart;
+                    }
                 }
             }
         }
