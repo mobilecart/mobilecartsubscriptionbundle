@@ -5,6 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
+        <parameter key="cart.listener.subscription.checkout.form.class">MobileCart\SubscriptionBundle\EventListener\Checkout\CheckoutForm</parameter>
+        <parameter key="cart.listener.subscription.cart.add.product.class">MobileCart\SubscriptionBundle\EventListener\Cart\AddProduct</parameter>
         <parameter key="cart.repo.subscription">MobileCartSubscriptionBundle:Subscription</parameter>
         <parameter key="cart.repo.subscription_customer">MobileCartSubscriptionBundle:SubscriptionCustomer</parameter>
         <parameter key="cart.subscription.class">MobileCart\SubscriptionBundle\Service\SubscriptionService</parameter>
@@ -39,6 +41,26 @@
     </parameters>
 
     <services>
+
+        <!-- Event Listener: Checkout Form, configure subscription payment options -->
+        <service id="cart.listener.subscription.checkout.form" lazy="true" class="%cart.listener.subscription.checkout.form.class%">
+            <tag name="kernel.event_listener" event="checkout.form" method="onCheckoutForm" priority="55" />
+            <call method="setCheckoutSessionService">
+                <argument type="service" id="cart.checkout.session" />
+            </call>
+            <call method="setEntityService">
+                <argument type="service" id="cart.entity" />
+            </call>
+        </service>
+
+        <!-- Event Listener: Add Product to Cart : from a User Session, not for APIs -->
+        <service id="cart.listener.subscription.cart.add.product" lazy="true" class="%cart.listener.subscription.cart.add.product.class%">
+            <tag name="kernel.event_listener" event="cart.add.product" method="onCartAddProduct" priority="40" />
+            <call method="setEntityService">
+                <argument type="service" id="cart.entity" />
+            </call>
+        </service>
+
         <!-- Subscription Service -->
         <service id="cart.subscription" lazy="true" class="%cart.subscription.class%">
             <call method="setIsEnabled">

@@ -14,6 +14,11 @@ use MobileCart\CoreBundle\Entity\CartEntityInterface;
 class Subscription
     implements CartEntityInterface
 {
+
+    const HANDLER_SERVER_AUTO = 1;
+    const HANDLER_SERVER_MANUAL = 2;
+    const HANDLER_SERVICE_EXTERNAL = 3;
+
     /**
      * @var int
      *
