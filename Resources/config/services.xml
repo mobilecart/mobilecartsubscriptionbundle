@@ -56,6 +56,7 @@
         <!-- Event Listener: Add Product to Cart : from a User Session, not for APIs -->
         <service id="cart.listener.subscription.cart.add.product" lazy="true" class="%cart.listener.subscription.cart.add.product.class%">
             <tag name="kernel.event_listener" event="cart.add.product" method="onCartAddProduct" priority="40" />
+            <tag name="kernel.event_listener" event="cart.add.discount" method="onCartAddProduct" priority="40" />
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
             </call>

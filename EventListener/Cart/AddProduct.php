@@ -94,6 +94,32 @@ class AddProduct
                         $returnData['cart'] = $cart;
                     }
                 }
+            } else {
+                if ($cart->getItems()) {
+                    $removed = false;
+                    foreach($cart->getItems() as $item) {
+                        if ($item->getSubscriptionId()) {
+                            $cart->removeProductId($item->getProductId());
+                            $removed = true;
+                        }
+                    }
+
+                    if ($removed) {
+
+                        $cart = $this->getCartSessionService()
+                            ->setCart($cart)
+                            ->collectShippingMethods()
+                            ->collectTotals()
+                            ->getCart();
+
+                        $cartEntity = $event->getCartEntity();
+
+                        // update db
+                        $cartEntity->setJson($cart->toJson());
+                        $this->getEntityService()->persist($cartEntity);
+                        $returnData['cart'] = $cart;
+                    }
+                }
             }
         }
     }
