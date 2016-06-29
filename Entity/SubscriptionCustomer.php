@@ -3,6 +3,7 @@
 namespace MobileCart\SubscriptionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use MobileCart\CoreBundle\Entity\CartEntityInterface;
 
 /**
  * SubscriptionCustomer
@@ -11,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="MobileCart\SubscriptionBundle\Repository\SubscriptionCustomerRepository")
  */
 class SubscriptionCustomer
+    implements CartEntityInterface
 {
     /**
      * @var int
@@ -20,6 +22,13 @@ class SubscriptionCustomer
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     */
+    private $created_at;
 
     /**
      * @var \MobileCart\SubscriptionBundle\Entity\Subscription
@@ -248,6 +257,7 @@ class SubscriptionCustomer
     {
         return [
             'id' => $this->getId(),
+            'created_at' => $this->getCreatedAt(),
             'customer_name' => $this->getCustomerName(),
             //'parent_subscription_customer_id' => $this->
             //'customer_id' => $this->
@@ -259,6 +269,28 @@ class SubscriptionCustomer
             'payment_reminder_at' => $this->getPaymentReminderAt(),
             'is_logged_in' => $this->getIsLoggedIn(),
         ];
+    }
+
+    /**
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->created_at = $createdAt;
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
     }
 
     /**

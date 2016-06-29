@@ -43,6 +43,17 @@ class AddProduct
         return $this->entityService;
     }
 
+    public function setCartSessionService($cartSessionService)
+    {
+        $this->cartSessionService = $cartSessionService;
+        return $this;
+    }
+
+    public function getCartSessionService()
+    {
+        return $this->cartSessionService;
+    }
+
     public function onCartAddProduct(Event $event)
     {
         $this->setEvent($event);
@@ -62,7 +73,7 @@ class AddProduct
                     $removed = false;
                     foreach($cart->getItems() as $item) {
                         if ($item->getProductId() != $productId) {
-                            $cart->removeProductId($productId); // todo : add a config option for this
+                            $cart->removeProductId($item->getProductId()); // todo : add a config option for this
                             $removed = true;
                         }
                     }
@@ -70,6 +81,7 @@ class AddProduct
                     if ($removed) {
 
                         $cart = $this->getCartSessionService()
+                            ->setCart($cart)
                             ->collectShippingMethods()
                             ->collectTotals()
                             ->getCart();

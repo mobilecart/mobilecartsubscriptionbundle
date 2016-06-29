@@ -4,6 +4,7 @@ namespace MobileCart\SubscriptionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use MobileCart\CoreBundle\Entity\Customer;
+use MobileCart\CoreBundle\Entity\CartEntityInterface;
 
 /**
  * SubscriptionPayment
@@ -12,6 +13,7 @@ use MobileCart\CoreBundle\Entity\Customer;
  * @ORM\Entity(repositoryClass="MobileCart\SubscriptionBundle\Repository\SubscriptionPaymentRepository")
  */
 class SubscriptionPayment
+    implements CartEntityInterface
 {
     /**
      * @var int
@@ -21,6 +23,13 @@ class SubscriptionPayment
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     */
+    private $created_at;
 
     /**
      * @var \MobileCart\SubscriptionBundle\Entity\Subscription
@@ -41,13 +50,6 @@ class SubscriptionPayment
      * })
      */
     private $customer;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="payment_date", type="datetime")
-     */
-    private $payment_date;
 
     /**
      * @var string
@@ -101,6 +103,146 @@ class SubscriptionPayment
         return $this->id;
     }
 
+    public function getObjectTypeName()
+    {
+        return \MobileCart\SubscriptionBundle\Constants\EntityConstants::SUBSCRIPTION_PAYMENT;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function set($key, $value)
+    {
+        $vars = get_object_vars($this);
+        if (array_key_exists($key, $vars)) {
+            $this->$key = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $data
+     * @return $this
+     */
+    public function fromArray($data)
+    {
+        if (!$data) {
+            return $this;
+        }
+
+        foreach($data as $key => $value) {
+            $this->set($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Lazy-loading getter
+     *  ideal for usage in the View layer
+     *
+     * @param $key
+     * @return mixed|null
+     */
+    public function get($key)
+    {
+        if (isset($this->$key)) {
+            return $this->$key;
+        }
+
+        $data = $this->getBaseData();
+        if (isset($data[$key])) {
+            return $data[$key];
+        }
+
+        $data = $this->getData();
+        if (isset($data[$key])) {
+
+            if (is_array($data[$key])) {
+                return implode(',', $data[$key]);
+            }
+
+            return $data[$key];
+        }
+
+        return '';
+    }
+
+    /**
+     * Getter , after fully loading
+     *  use only if necessary, and avoid calling multiple times
+     *
+     * @param string $key
+     * @return array|null
+     */
+    public function getData($key = '')
+    {
+        $data = $this->getBaseData();
+
+        if (strlen($key) > 0) {
+
+            return isset($data[$key])
+                ? $data[$key]
+                : null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLuceneVarValuesData()
+    {
+        // Note:
+        // be careful with adding foreign relationships here
+        // since it will add 1 query every time an item is loaded
+
+        return $this->getBaseData();
+    }
+
+    /**
+     * @return array
+     */
+    public function getBaseData()
+    {
+        return [
+            'id' => $this->getId(),
+            'created_at' => $this->getCreatedAt(),
+            'payment_method' => $this->getPaymentMethod(),
+            'base_currency' => $this->getBaseCurrency(),
+            'base_amount' => $this->getBaseAmount(),
+            'currency' => $this->getCurrency(),
+            'amount' => $this->getAmount(),
+            'is_approved' => $this->getIsApproved(),
+        ];
+    }
+
+    /**
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->created_at = $createdAt;
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
     /**
      * @param Subscription $subscription
      * @return $this
@@ -140,28 +282,6 @@ class SubscriptionPayment
     public function getCustomer()
     {
         return $this->customer;
-    }
-
-    /**
-     * Set paymentDate
-     *
-     * @param \DateTime $paymentDate
-     * @return SubscriptionPayment
-     */
-    public function setPaymentDate($paymentDate)
-    {
-        $this->payment_date = $paymentDate;
-        return $this;
-    }
-
-    /**
-     * Get paymentDate
-     *
-     * @return \DateTime 
-     */
-    public function getPaymentDate()
-    {
-        return $this->payment_date;
     }
 
     /**
