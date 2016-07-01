@@ -5,6 +5,8 @@ namespace MobileCart\SubscriptionBundle\EventListener\Cart;
 use MobileCart\CoreBundle\CartComponent\ArrayWrapper;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AddProduct
 {
@@ -60,6 +62,7 @@ class AddProduct
         $returnData = $this->getReturnData();
         $cart = $returnData['cart'];
         $request = $event->getRequest();
+        $format = $request->get('format', '');
 
         $productId = $event->getProductId()
             ? $event->getProductId()
@@ -92,6 +95,22 @@ class AddProduct
                         $cartEntity->setJson($cart->toJson());
                         $this->getEntityService()->persist($cartEntity);
                         $returnData['cart'] = $cart;
+
+                        $response = '';
+                        switch($format) {
+                            case 'json':
+                                $response = new JsonResponse($returnData);
+                                break;
+                            default:
+                                $params = [];
+                                $route = 'cart_view';
+                                $url = $this->getRouter()->generate($route, $params);
+                                $response = new RedirectResponse($url);
+                                break;
+                        }
+
+                        $event->setReturnData($returnData);
+                        $event->setResponse($response);
                     }
                 }
             } else {
