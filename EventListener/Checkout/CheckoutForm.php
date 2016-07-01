@@ -70,6 +70,10 @@ class CheckoutForm
             ->getCartSessionService();
 
         $cart = $cartSession->getCart();
+        if (!$cart) {
+            $cart = $cartSession->initCart()->getCart();
+        }
+
         $customer = $cart->getCustomer();
 
         $subItems = [];
