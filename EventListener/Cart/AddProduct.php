@@ -60,10 +60,10 @@ class AddProduct
         $returnData = $this->getReturnData();
         $cart = $returnData['cart'];
         $request = $event->getRequest();
-        $productId = $request->get('id', '');
-        if (!$productId) {
-            $productId = $event->get('product_id');
-        }
+
+        $productId = $event->getProductId()
+            ? $event->getProductId()
+            : $request->get('id', '');
 
         if ($cartItem = $cart->findItem('product_id', $productId)) {
             if ($cartItem->getSubscriptionId()) {
