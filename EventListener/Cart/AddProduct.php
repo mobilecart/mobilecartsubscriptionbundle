@@ -100,17 +100,12 @@ class AddProduct
                         switch($format) {
                             case 'json':
                                 $response = new JsonResponse($returnData);
+                                $event->setResponse($response);
                                 break;
                             default:
-                                $params = [];
-                                $route = 'cart_view';
-                                $url = $this->getRouter()->generate($route, $params);
-                                $response = new RedirectResponse($url);
+                                // no-op
                                 break;
                         }
-
-                        $event->setReturnData($returnData);
-                        $event->setResponse($response);
                     }
                 }
             } else {
@@ -142,17 +137,12 @@ class AddProduct
                         switch($format) {
                             case 'json':
                                 $response = new JsonResponse($returnData);
+                                $event->setResponse($response);
                                 break;
                             default:
-                                $params = [];
-                                $route = 'cart_view';
-                                $url = $this->getRouter()->generate($route, $params);
-                                $response = new RedirectResponse($url);
+                                // no-op
                                 break;
                         }
-
-                        $event->setReturnData($returnData);
-                        $event->setResponse($response);
                     }
                 }
             }
