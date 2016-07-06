@@ -7,7 +7,7 @@ class FrontendExtension extends \Twig_Extension
     /**
      * @var
      */
-    protected $cartSessionService;
+    protected $subscriptionSessionService;
 
     /**
      * @var
@@ -38,21 +38,21 @@ class FrontendExtension extends \Twig_Extension
     }
 
     /**
-     * @param $cartSessionService
+     * @param $subscriptionSessionService
      * @return $this
      */
-    public function setCartSessionService($cartSessionService)
+    public function setSubscriptionSessionService($subscriptionSessionService)
     {
-        $this->cartSessionService = $cartSessionService;
+        $this->subscriptionSessionService = $subscriptionSessionService;
         return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getCartSessionService()
+    public function getSubscriptionSessionService()
     {
-        return $this->cartSessionService;
+        return $this->subscriptionSessionService;
     }
 
     public function setSession($session)
@@ -71,20 +71,6 @@ class FrontendExtension extends \Twig_Extension
      */
     public function getIsSubscribed()
     {
-        if (!$this->getCartSessionService()->getCart()) {
-            return false;
-        }
-
-        if (!$this->getCartSessionService()->getCart()->getCustomer()) {
-            return false;
-        }
-
-        if (!$this->getCartSessionService()->getCart()->getCustomer()->getSubscriptionCustomer()) {
-            return false;
-        }
-
-        return $this->getCartSessionService()->getCart()->getCustomer()
-            ->getSubscriptionCustomer()
-            ->getIsActive();
+        return $this->getSubscriptionSessionService()->getIsSubscribed();
     }
 }

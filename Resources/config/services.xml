@@ -11,6 +11,7 @@
         <parameter key="cart.repo.subscription">MobileCartSubscriptionBundle:Subscription</parameter>
         <parameter key="cart.repo.subscription_customer">MobileCartSubscriptionBundle:SubscriptionCustomer</parameter>
         <parameter key="cart.subscription.class">MobileCart\SubscriptionBundle\Service\SubscriptionService</parameter>
+        <parameter key="cart.subscription.session.class">MobileCart\SubscriptionBundle\Service\SubscriptionSessionService</parameter>
         <parameter key="cart.subscription.enabled">1</parameter>
         <parameter key="cart.twig.subscription.frontend.class">MobileCart\SubscriptionBundle\Twig\Extension\FrontendExtension</parameter>
         <parameter key="cart.listener.subscription.search.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionSearch</parameter>
@@ -43,14 +44,21 @@
 
     <services>
 
+        <!-- Subscription Session -->
+        <service id="cart.subscription.session" lazy="true" class="%cart.subscription.session.class%">
+            <call method="setCartSessionService">
+                <argument type="service" id="cart.session" />
+            </call>
+        </service>
+
         <!-- Twig Extension -->
         <service id="cart.twig.subscription.frontend" lazy="true" class="%cart.twig.subscription.frontend.class%">
             <tag name="twig.extension" />
             <call method="setSession">
                 <argument type="service" id="session" />
             </call>
-            <call method="setCartSessionService">
-                <argument type="service" id="cart.session" />
+            <call method="setSubscriptionSessionService">
+                <argument type="service" id="cart.subscription.session" />
             </call>
         </service>
 
