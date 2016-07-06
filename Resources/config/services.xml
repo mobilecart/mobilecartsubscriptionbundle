@@ -12,6 +12,7 @@
         <parameter key="cart.repo.subscription_customer">MobileCartSubscriptionBundle:SubscriptionCustomer</parameter>
         <parameter key="cart.subscription.class">MobileCart\SubscriptionBundle\Service\SubscriptionService</parameter>
         <parameter key="cart.subscription.enabled">1</parameter>
+        <parameter key="cart.twig.subscription.frontend.class">MobileCart\SubscriptionBundle\Twig\Extension\FrontendExtension</parameter>
         <parameter key="cart.listener.subscription.search.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionSearch</parameter>
         <parameter key="cart.listener.subscription.list.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionList</parameter>
         <parameter key="cart.listener.subscription.edit.return.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionEditReturn</parameter>
@@ -22,7 +23,6 @@
         <parameter key="cart.listener.subscription.insert.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionInsert</parameter>
         <parameter key="cart.listener.subscription.delete.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionDelete</parameter>
         <parameter key="cart.listener.subscription.admin.form.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionAdminForm</parameter>
-
         <parameter key="cart.listener.subscription_customer.search.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerSearch</parameter>
         <parameter key="cart.listener.subscription_customer.list.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerList</parameter>
         <parameter key="cart.listener.subscription_customer.frontend.list.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerFrontendList</parameter>
@@ -42,6 +42,17 @@
     </parameters>
 
     <services>
+
+        <!-- Twig Extension -->
+        <service id="cart.twig.subscription.frontend" lazy="true" class="%cart.twig.subscription.frontend.class%">
+            <tag name="twig.extension" />
+            <call method="setSession">
+                <argument type="service" id="session" />
+            </call>
+            <call method="setCartSessionService">
+                <argument type="service" id="cart.session" />
+            </call>
+        </service>
 
         <!-- Login Listener -->
         <service id="cart.listener.subscription.login" lazy="true" class="%cart.listener.subscription.login.class%">
