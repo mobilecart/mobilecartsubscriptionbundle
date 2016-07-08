@@ -73,6 +73,7 @@ class AddProduct
                 $subscription = $this->getEntityService()->find(EntityConstants::SUBSCRIPTION, $cartItem->getSubscriptionId());
                 if ($subscription) {
                     $cartItem->setSubscription(new ArrayWrapper($subscription->getData()));
+                    $cart->setProductQty($productId, 1);
                     $removed = false;
                     foreach($cart->getItems() as $item) {
                         if ($item->getProductId() != $productId) {
