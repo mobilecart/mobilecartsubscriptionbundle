@@ -12,6 +12,7 @@
         <parameter key="cart.repo.subscription_customer">MobileCartSubscriptionBundle:SubscriptionCustomer</parameter>
         <parameter key="cart.subscription.class">MobileCart\SubscriptionBundle\Service\SubscriptionService</parameter>
         <parameter key="cart.subscription.session.class">MobileCart\SubscriptionBundle\Service\SubscriptionSessionService</parameter>
+        <parameter key="cart.subscription.order.submit.success.class">MobileCart\SubscriptionBundle\EventListener\Checkout\OrderSubmitSuccess</parameter>
         <parameter key="cart.subscription.enabled">1</parameter>
         <parameter key="cart.twig.subscription.frontend.class">MobileCart\SubscriptionBundle\Twig\Extension\FrontendExtension</parameter>
         <parameter key="cart.listener.subscription.search.class">MobileCart\SubscriptionBundle\EventListener\Subscription\SubscriptionSearch</parameter>
@@ -43,6 +44,14 @@
     </parameters>
 
     <services>
+
+        <!-- Order Success -->
+        <service id="cart.subscription.order.submit.success" lazy="true" class="%cart.subscription.order.submit.success.class%">
+            <tag name="kernel.event_listener" event="order.submit.success" method="onOrderSubmitSuccess" priority="50" />
+            <call method="setEntityService">
+                <argument type="service" id="cart.entity" />
+            </call>
+        </service>
 
         <!-- Subscription Session -->
         <service id="cart.subscription.session" lazy="true" class="%cart.subscription.session.class%">
