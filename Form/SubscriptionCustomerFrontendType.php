@@ -34,7 +34,8 @@ class SubscriptionCustomerFrontendType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'MobileCart\CoreBundle\Entity\Customer'
+            'data_class' => 'MobileCart\CoreBundle\Entity\Customer',
+            'csrf_protection' => false,
         ));
     }
 
