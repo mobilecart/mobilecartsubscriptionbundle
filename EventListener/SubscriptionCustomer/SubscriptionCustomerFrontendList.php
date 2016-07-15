@@ -78,11 +78,32 @@ class SubscriptionCustomerFrontendList
         $response = '';
 
         $entities = [];
+
+        $subscriptionCustomer = $this->getEntityService()->findBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
+            'customer' => $user->getId(),
+        ]);
+
+        if ($subscriptionCustomer) {
+
+            $customer = $subscriptionCustomer->getCustomer();
+
+            $entities[] = [
+                'id' => $customer->getId(),
+                'first_name' => $customer->getFirstName(),
+                'last_name' => $customer->getLastName(),
+                'name' => $customer->getName(),
+                'email' => $customer->getEmail(),
+                'billing_phone' => $customer->getBillingPhone(),
+            ];
+        }
+
         $subscriptionCustomers = $this->getEntityService()->findBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
             'parent_subscription_customer' => $user->getId(),
         ]);
 
         if ($subscriptionCustomers) {
+
+
             foreach($subscriptionCustomers as $subscriptionCustomer) {
                 $customer = $subscriptionCustomer->getCustomer();
 
@@ -94,7 +115,6 @@ class SubscriptionCustomerFrontendList
                     'email' => $customer->getEmail(),
                     'billing_phone' => $customer->getBillingPhone(),
                 ];
-
             }
         }
 
