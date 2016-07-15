@@ -79,7 +79,7 @@ class SubscriptionCustomerFrontendList
 
         $entities = [];
 
-        $subscriptionCustomer = $this->getEntityService()->findBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
+        $subscriptionCustomer = $this->getEntityService()->findOneBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
             'customer' => $user->getId(),
         ]);
 
