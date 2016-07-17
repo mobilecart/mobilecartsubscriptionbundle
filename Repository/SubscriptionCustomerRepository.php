@@ -51,6 +51,11 @@ class SubscriptionCustomerRepository
                 'label' => 'Customer Name',
                 'type'  => 'string',
             ],
+            [
+                'code'  => 'parent_customer_id',
+                'label' => 'Parent Customer',
+                'type'  => 'number',
+            ],
         ];
     }
 
