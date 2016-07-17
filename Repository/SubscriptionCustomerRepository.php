@@ -52,8 +52,8 @@ class SubscriptionCustomerRepository
                 'type'  => 'string',
             ],
             [
-                'code'  => 'parent_customer_id',
-                'label' => 'Parent Customer',
+                'code'  => 'parent_subscription_customer_id',
+                'label' => 'Parent Subscription',
                 'type'  => 'number',
             ],
         ];
