@@ -87,6 +87,7 @@ class SubscriptionCustomerFrontendList
 
             $customer = $subscriptionCustomer->getCustomer();
 
+            /*
             $entities[] = [
                 'id' => $customer->getId(),
                 'first_name' => $customer->getFirstName(),
@@ -94,7 +95,7 @@ class SubscriptionCustomerFrontendList
                 'name' => $customer->getName(),
                 'email' => $customer->getEmail(),
                 'billing_phone' => $customer->getBillingPhone(),
-            ];
+            ]; //*/
 
             $subscriptionCustomers = $this->getEntityService()->findBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
                 'parent_subscription_customer' => $subscriptionCustomer->getId(),

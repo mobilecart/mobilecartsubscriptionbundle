@@ -14,6 +14,7 @@ namespace MobileCart\SubscriptionBundle\Controller\Frontend;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 use MobileCart\CoreBundle\Constants\EntityConstants as CoreEntityConstants;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -173,5 +174,41 @@ class SubscriptionCustomerController extends Controller
             ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD_SUCCESS, $event);
 
         return $event->getResponse();
+    }
+
+    /**
+     * @Route("/customer/subscription/shared/remove", name="subscription_customer_remove")
+     * @Method("POST")
+     */
+    public function removeAction(Request $request)
+    {
+        $customerId = $request->get('customer_id', 0);
+        $user = $this->getUser();
+        $parentSubscription = $this->get('cart.entity')->findOneBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
+            'customer' => $user->getId(),
+        ]);
+
+        if (!$parentSubscription) {
+            throw $this->createNotFoundException("Unable to find your subscription");
+        }
+
+        $entity = $this->get('cart.entity')->findOneBy($this->objectType, [
+            'parent_subscription_customer' => $parentSubscription->getId(),
+            'customer' => $customerId,
+        ]);
+
+        if (!$entity) {
+            throw $this->createNotFoundException("Unable to find entity with Customer ID: {$customerId}");
+        }
+
+        $this->get('cart.entity')->remove($entity);
+
+        if ($request->get('format', '') == 'json') {
+            return new JsonResponse([
+                'success' => 1,
+            ]);
+        }
+
+        return new RedirectResponse($request->headers->get('referer'));
     }
 }

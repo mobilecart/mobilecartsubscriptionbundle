@@ -7,9 +7,9 @@
         <div class="col-sm-12 table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable">
                 <tr>
-                    <th>&nbsp;</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>&nbsp;</th>
                 </tr>
                 {% if entities|length == 0 %}
                     <tr>
@@ -20,9 +20,14 @@
                 {% else %}
                     {% for entity in entities %}
                         <tr>
-                            <td>&nbsp;</td>
                             <td>{{ entity.name }}</td>
                             <td>{{ entity.email }}</td>
+                            <td>
+                                <form method="post" action="{{ path('subscription_customer_remove') }}">
+                                    <input type="hidden" name="customer_id" value="{{ entity.id }}" />
+                                    <button type="submit" class="btn btn-default">Remove</button>
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}
