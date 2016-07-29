@@ -235,6 +235,13 @@ class SubscriptionCustomer
                 : null;
         }
 
+        $parentSubscriptionCustomerId = null;
+        if ($this->getParentSubscriptionCustomer()) {
+            $parentSubscriptionCustomerId = $this->getParentSubscriptionCustomer()->getId();
+        }
+
+        $data['parent_subscription_customer_id'] = $parentSubscriptionCustomerId;
+
         return $data;
     }
 
