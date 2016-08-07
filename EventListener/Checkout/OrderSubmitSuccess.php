@@ -68,11 +68,16 @@ class OrderSubmitSuccess
                 continue;
             }
 
+            $customerName = $event->getOrder()->getBillingName();
+            if (!$customerName) {
+                $customerName = '';
+            }
+
             $subscriptionCustomer = $this->getEntityService()->getInstance(EntityConstants::SUBSCRIPTION_CUSTOMER);
             $subscriptionCustomer->setSubscription($subscription)
                 ->setCustomer($customer)
                 ->setCreatedAt(new \DateTime('now'))
-                ->setCustomerName($event->getOrder()->getBillingName())
+                ->setCustomerName($customerName)
                 ->setCustomerToken($customerToken)
                 ->setIsActive(1);
 
