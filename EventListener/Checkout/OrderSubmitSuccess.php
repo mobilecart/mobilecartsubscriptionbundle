@@ -82,6 +82,7 @@ class OrderSubmitSuccess
                 ->setIsActive(1);
 
             $this->getEntityService()->persist($subscriptionCustomer);
+            break; // assuming a single subscription
         }
 
     }
