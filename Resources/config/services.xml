@@ -51,6 +51,9 @@
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
             </call>
+            <call method="setSubscriptionSessionService">
+                <argument type="service" id="cart.subscription.session" />
+            </call>
         </service>
 
         <!-- Subscription Session -->

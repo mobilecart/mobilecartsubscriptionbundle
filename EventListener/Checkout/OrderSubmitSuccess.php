@@ -9,6 +9,8 @@ class OrderSubmitSuccess
 {
     protected $entityService;
 
+    protected $subscriptionSessionService;
+
     protected $event;
 
     protected function setEvent($event)
@@ -38,6 +40,17 @@ class OrderSubmitSuccess
     public function getEntityService()
     {
         return $this->entityService;
+    }
+
+    public function setSubscriptionSessionService($subscriptionSessionService)
+    {
+        $this->subscriptionSessionService = $subscriptionSessionService;
+        return $this;
+    }
+
+    public function getSubscriptionSessionService()
+    {
+        return $this->subscriptionSessionService;
     }
 
     public function onOrderSubmitSuccess(Event $event)
@@ -82,6 +95,9 @@ class OrderSubmitSuccess
                 ->setIsActive(1);
 
             $this->getEntityService()->persist($subscriptionCustomer);
+
+            $this->getSubscriptionSessionService()->setSubscriptionCustomer($subscriptionCustomer);
+
             break; // assuming a single subscription
         }
 

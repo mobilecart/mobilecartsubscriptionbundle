@@ -2,8 +2,8 @@
 
 namespace MobileCart\SubscriptionBundle\Service;
 
-use MobileCart\CoreBundle\Constants\EntityConstants;
-use MobileCart\SubscriptionBundle\Constants\EntityConstants as SubEntityConstants;
+use MobileCart\CoreBundle\CartComponent\ArrayWrapper;
+use MobileCart\SubscriptionBundle\Entity\SubscriptionCustomer;
 
 class SubscriptionSessionService
 {
@@ -40,5 +40,21 @@ class SubscriptionSessionService
         return $this->getCartSessionService()->getCart()->getCustomer()
             ->getSubscriptionCustomer()
             ->getIsActive();
+    }
+
+    /**
+     * @param SubscriptionCustomer $subscriptionCustomer
+     * @return $this
+     */
+    public function setSubscriptionCustomer(SubscriptionCustomer $subscriptionCustomer)
+    {
+        $subCustomerData = new ArrayWrapper($subscriptionCustomer->getData());
+        $subData = new ArrayWrapper($subscriptionCustomer->getSubscription()->getData());
+
+        $this->getCartSessionService()->getCart()->getCustomer()
+            ->set('subscription_customer', $subCustomerData)
+            ->set('subscription', $subData);
+
+        return $this;
     }
 }
