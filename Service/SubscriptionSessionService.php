@@ -51,12 +51,9 @@ class SubscriptionSessionService
         $subCustomerData = new ArrayWrapper($subscriptionCustomer->getData());
         $subData = new ArrayWrapper($subscriptionCustomer->getSubscription()->getData());
 
-        // making this more explicit since its not always working
-        $customer = $this->getCartSessionService()->getCart()->getCustomer();
-        $customer->set('subscription_customer', $subCustomerData)
+        $this->getCartSessionService()->getCart()->getCustomer()
+            ->set('subscription_customer', $subCustomerData)
             ->set('subscription', $subData);
-
-        $this->getCartSessionService()->setCustomer($customer);
 
         return $this;
     }
