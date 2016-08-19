@@ -42,6 +42,37 @@ class SubscriptionSessionService
             ->getIsActive();
     }
 
+
+    public function getCalcIsInFreeTrial()
+    {
+        if (!$this->getCartSessionService()->getCart()) {
+            return false;
+        }
+
+        if (!$this->getCartSessionService()->getCart()->getCustomer()) {
+            return false;
+        }
+
+        if (!$this->getCartSessionService()->getCart()->getCustomer()->getSubscriptionCustomer()) {
+            return false;
+        }
+
+        $subCustomer = $this->getCartSessionService()->getCart()->getCustomer()
+            ->getSubscriptionCustomer();
+
+        $sub = $this->getCartSessionService()->getCart()->getCustomer()
+            ->getSubscription();
+
+        if ($sub->getFreeTrialDays()) {
+            $freeTrialDays = (int) $sub->getFreeTrialDays();
+            $startDate = $subCustomer->getCreatedAt();
+
+
+        }
+
+        return false;
+    }
+
     /**
      * @param SubscriptionCustomer $subscriptionCustomer
      * @return $this

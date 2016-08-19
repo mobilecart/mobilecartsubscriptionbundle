@@ -92,6 +92,11 @@ class SubscriptionCustomerList
                 'sort' => 1,
             ],
             [
+                'key' => 'parent_subscription_customer_id',
+                'label' => 'Parent Subscription',
+                'sort' => 1,
+            ],
+            [
                 'key' => 'email',
                 'label' => 'Email',
                 'sort' => 1,
