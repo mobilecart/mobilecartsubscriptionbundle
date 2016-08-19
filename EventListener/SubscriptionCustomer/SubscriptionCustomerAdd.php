@@ -136,6 +136,7 @@ class SubscriptionCustomerAdd
                         ->setCustomer($customer)
                         ->setParentSubscriptionCustomer($parentSubscription)
                         ->setSubscription($parentSubscription->getSubscription())
+                        ->setCreatedAt(new \DateTime('now'))
                         ->setIsActive(1)
                         ;
 
@@ -187,6 +188,7 @@ class SubscriptionCustomerAdd
                     ->setCustomer($entity)
                     ->setParentSubscriptionCustomer($parentSubscription)
                     ->setSubscription($parentSubscription->getSubscription())
+                    ->setCreatedAt(new \DateTime('now'))
                     ->setIsActive(1)
                 ;
 
