@@ -33,6 +33,7 @@ class SubscriptionCustomerRepository
             'customer_name' => 'Customer Name',
             'email' => 'Email', // including customer.email because we join tables in SubscriptionCustomerSearch
             'parent_subscription_customer_id' => 'Parent Subscription',
+            'created_at' => 'Created At',
         ];
     }
 
