@@ -24,7 +24,7 @@ class SubscriptionCustomerType extends AbstractType
             ->add('customer')
             ->add('customer_name')
             ->add('parent_subscription_customer')
-            ->add('customer_token')
+            ->add('customer_token', 'text')
         ;
     }
     
