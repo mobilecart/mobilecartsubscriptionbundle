@@ -346,10 +346,10 @@ class SubscriptionCustomerController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-        $form = $this->createDeleteForm($id);
-        $form->handleRequest($request);
+        //$form = $this->createDeleteForm($id);
+        //$form->handleRequest($request);
 
-        if ($form->isValid()) {
+        //if ($form->isValid()) {
             $entity = $this->get('cart.entity')->find($this->objectType, $id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Subscription entity.');
@@ -363,13 +363,11 @@ class SubscriptionCustomerController extends Controller
             $this->get('event_dispatcher')
                 ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_DELETE, $event);
 
-            // todo : event
-
             $request->getSession()->getFlashBag()->add(
                 'success',
                 'Subscription Successfully Deleted!'
             );
-        }
+        //}
 
         return $this->redirect($this->generateUrl('cart_admin_subscription_customer'));
     }
