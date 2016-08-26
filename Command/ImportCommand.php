@@ -102,18 +102,17 @@ EOF
                     $output->writeln("Saved Customer ID: {$customer->getId()}");
                 }
 
-                if ($tokenData) {
-                    $customerToken = $entityService->findOneBy('customer_token', [
-                        'customer' => $customer->getId(),
-                    ]);
+                $customerToken = $entityService->findOneBy('customer_token', [
+                    'customer' => $customer->getId(),
+                ]);
 
-                    if (!$customerToken) {
-                        $customerToken = $entityService->getInstance('customer_token');
-                        $customerToken->fromArray($tokenData);
-                        $customerToken->setCustomer($customer);
-                        $entityService->persist($customerToken);
-                        $output->writeln("Created Token");
-                    }
+                if ($tokenData && !$customerToken) {
+
+                    $customerToken = $entityService->getInstance('customer_token');
+                    $customerToken->fromArray($tokenData);
+                    $customerToken->setCustomer($customer);
+                    $entityService->persist($customerToken);
+                    $output->writeln("Created Token");
                 }
 
                 if (!$subCustomerData) {
@@ -126,6 +125,12 @@ EOF
                 ]);
 
                 if ($subCustomer) {
+
+                    if ($customerToken && !$subCustomer->getCustomerToken()) {
+                        $subCustomer->setCustomerToken($customerToken);
+                        $entityService->persist($subCustomer);
+                    }
+
                     continue;
                 }
 
