@@ -61,12 +61,15 @@ EOF
 
                 $subCustomerData = [];
                 $subData = [];
+                $tokenData = [];
                 if (isset($customerData['subscription_customer'])) {
 
                     $subCustomerData = (array) $customerData['subscription_customer'];
                     $subData = (array) $customerData['subscription'];
+                    $tokenData = (array) $customerData['customer_token'];
                     unset($customerData['subscription_customer']);
                     unset($customerData['subscription']);
+                    unset($customerData['customer_token']);
 
                     if (isset($subCustomerData['created_at']) && is_object($subCustomerData['created_at'])) {
                         $createdAtObj = $subCustomerData['created_at'];
@@ -99,8 +102,30 @@ EOF
                     $output->writeln("Saved Customer ID: {$customer->getId()}");
                 }
 
+                if ($tokenData) {
+                    $customerToken = $entityService->findOneBy('customer_token', [
+                        'customer' => $customer->getId(),
+                    ]);
+
+                    if (!$customerToken) {
+                        $customerToken = $entityService->getInstance('customer_token');
+                        $customerToken->fromArray($tokenData);
+                        $customerToken->setCustomer($customer);
+                        $entityService->persist($customerToken);
+                        $output->writeln("Created Token");
+                    }
+                }
+
                 if (!$subCustomerData) {
                     $output->writeln("No subscription");
+                    continue;
+                }
+
+                $subCustomer = $entityService->findOneBy('subscription_customer', [
+                    'customer' => $customer->getId(),
+                ]);
+
+                if ($subCustomer) {
                     continue;
                 }
 

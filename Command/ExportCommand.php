@@ -74,6 +74,11 @@ EOF
                 if ($subCustomer) {
                     $data['subscription_customer'] = $subCustomer->getData();
                     $data['subscription'] = $subCustomer->getSubscription()->getData();
+
+                    $customerToken = $entityService->findOneBy('customer_token', [
+                        'customer' => $customer->getId(),
+                    ]);
+                    $data['customer_token'] = $customerToken->getData();
                 }
 
                 $out = json_encode($data). "\n";
