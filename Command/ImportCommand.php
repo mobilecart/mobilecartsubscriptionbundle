@@ -149,6 +149,10 @@ EOF
                 $subCustomer->setSubscription($sub)
                     ->setCustomer($customer);
 
+                if ($customerToken) {
+                    $subCustomer->setCustomerToken($customerToken);
+                }
+
                 if ($subCustomerData['parent_subscription_customer_id'] > 0) {
                     $parentSubscription = $entityService->find('subscription_customer', $subCustomerData['parent_subscription_customer_id']);
                     if ($parentSubscription) {
