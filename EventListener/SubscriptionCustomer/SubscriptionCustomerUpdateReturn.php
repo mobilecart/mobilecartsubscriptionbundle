@@ -84,11 +84,10 @@ class SubscriptionCustomerUpdateReturn
             //    break;
             default:
 
-                if ($messages = $event->getMessages()) {
-                    foreach($messages as $code => $message) {
-                        $this->getSession()->getFlashBag()->add($code, $message);
-                    }
-                }
+                $event->getRequest()->getSession()->getFlashBag()->add(
+                    'success',
+                    'Subscription Successfully Updated!'
+                );
 
                 $response = new RedirectResponse($url);
                 break;

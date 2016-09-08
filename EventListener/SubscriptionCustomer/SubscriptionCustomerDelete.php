@@ -3,6 +3,7 @@
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 
 class SubscriptionCustomerDelete
@@ -11,6 +12,8 @@ class SubscriptionCustomerDelete
     protected $entityService;
 
     protected $event;
+
+    protected $router;
 
     protected function setEvent($event)
     {
@@ -28,6 +31,17 @@ class SubscriptionCustomerDelete
         return $this->getEvent()->getReturnData()
             ? $this->getEvent()->getReturnData()
             : [];
+    }
+
+    public function setRouter($router)
+    {
+        $this->router = $router;
+        return $this;
+    }
+
+    public function getRouter()
+    {
+        return $this->router;
     }
 
     public function setEntityService($entityService)
@@ -49,6 +63,14 @@ class SubscriptionCustomerDelete
         $entity = $event->getEntity();
         $this->getEntityService()->remove($entity, EntityConstants::SUBSCRIPTION_CUSTOMER);
 
-        $event->setReturnData($returnData);
+        $event->getRequest()->getSession()->getFlashBag()->add(
+            'success',
+            'Subscription Successfully Deleted!'
+        );
+
+        $response = new RedirectResponse($this->getRouter()->generate('cart_admin_subscription_customer', []));
+
+        $event->setReturnData($returnData)
+            ->setResponse($response);
     }
 }

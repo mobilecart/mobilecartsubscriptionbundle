@@ -1,16 +1,27 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Edit Subscription Customer{% endblock %}
-{% block subheader_text %}Name: {{ entity.get('customer_name') }}{% endblock %}
+{% block subheader_text %}
+    {{ entity.get('customer_name') }}
+    {% if entity.customertoken is defined %} ({{ entity.customertoken.serviceaccountid }}) {% endif %}
+    {% if entity.iscanceled %} - Canceled {% endif %}
+{% endblock %}
 {% block above_form %}
     <div class="row">
         <div class="col-xs-12 header-buttons">
             <a href="{{ renderGridBackUrl('cart_admin_subscription_customer') }}" class="btn btn-default">Back</a>
 
+            <form style="display:inline;" method="POST" action="{{ path('cart_admin_subscription_customer_cancel', {'id': entity.id}) }}">
+                <input type="hidden" name="_method" value="PUT" />
+                <input type="hidden" name="id" value="{{ entity.id }}" />
+                <input type="submit" name="submit" class="btn btn-warning" value="Cancel">
+            </form>
+
             <form style="display:inline;" method="POST" action="{{ path('cart_admin_subscription_customer_delete', {'id': entity.id}) }}">
                 <input type="hidden" name="_method" value="DELETE" />
                 <input type="hidden" name="id" value="{{ entity.id }}" />
-                <input type="submit" name="submit" class="btn btn-warning" value="Delete">
+                <input type="submit" name="submit" class="btn btn-danger" value="Delete">
             </form>
+
         </div>
     </div>
 {% endblock %}

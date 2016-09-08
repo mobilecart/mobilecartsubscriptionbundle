@@ -83,6 +83,13 @@ class SubscriptionCustomer
     private $customer_token;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="subscription_token", type="string", length=255, nullable=true)
+     */
+    private $subscription_token;
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="is_in_free_trial", type="boolean", nullable=true)
@@ -95,6 +102,13 @@ class SubscriptionCustomer
      * @ORM\Column(name="is_active", type="boolean", nullable=true)
      */
     private $is_active;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_canceled", type="boolean", nullable=true)
+     */
+    private $is_canceled;
 
     /**
      * @var bool
@@ -266,6 +280,8 @@ class SubscriptionCustomer
             'id' => $this->getId(),
             'created_at' => $this->getCreatedAt(),
             'customer_name' => $this->getCustomerName(),
+            'is_canceled' => $this->getIsCanceled(),
+            'subscription_token' => $this->getSubscriptionToken(),
             //'parent_subscription_customer_id' => $this->
             //'customer_id' => $this->
             //'subscription_id' => $this->
@@ -316,6 +332,42 @@ class SubscriptionCustomer
     public function getCustomerName()
     {
         return $this->customer_name;
+    }
+
+    /**
+     * @param $isCanceled
+     * @return $this
+     */
+    public function setIsCanceled($isCanceled)
+    {
+        $this->is_canceled = $isCanceled;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsCanceled()
+    {
+        return $this->is_canceled;
+    }
+
+    /**
+     * @param $subToken
+     * @return $this
+     */
+    public function setSubscriptionToken($subToken)
+    {
+        $this->subscription_token = $subToken;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionToken()
+    {
+        return $this->subscription_token;
     }
 
     /**
@@ -394,7 +446,7 @@ class SubscriptionCustomer
     }
 
     /**
-     * @return RecursiveIteratorIterator
+     * @return \RecursiveIteratorIterator
      */
     public function getChildren()
     {

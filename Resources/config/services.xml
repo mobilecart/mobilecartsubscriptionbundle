@@ -39,6 +39,7 @@
         <parameter key="cart.listener.subscription_customer.update.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerUpdate</parameter>
         <parameter key="cart.listener.subscription_customer.insert.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerInsert</parameter>
         <parameter key="cart.listener.subscription_customer.delete.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerDelete</parameter>
+        <parameter key="cart.listener.subscription_customer.cancel.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerCancel</parameter>
         <parameter key="cart.listener.subscription_customer.admin.form.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerAdminForm</parameter>
         <parameter key="cart.listener.subscription_customer.frontend.form.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerFrontendForm</parameter>
     </parameters>
@@ -284,6 +285,15 @@
             <tag name="kernel.event_listener" event="subscription_customer.delete" method="onSubscriptionCustomerDelete" priority="50" />
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
+            </call>
+            <call method="setRouter">
+                <argument type="service" id="router" />
+            </call>
+        </service>
+        <service id="cart.listener.subscription_customer.cancel" lazy="true" class="%cart.listener.subscription_customer.cancel.class%">
+            <tag name="kernel.event_listener" event="subscription_customer.cancel" method="onSubscriptionCustomerCancel" priority="50" />
+            <call method="setSubscriptionService">
+                <argument type="service" id="cart.subscription" />
             </call>
         </service>
         <service id="cart.listener.subscription_customer.admin.form" lazy="true" class="%cart.listener.subscription_customer.admin.form.class%">

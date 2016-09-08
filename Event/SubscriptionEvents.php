@@ -23,6 +23,7 @@ class SubscriptionEvents
     const SUBSCRIPTION_CUSTOMER_UPDATE = 'subscription_customer.update';
     const SUBSCRIPTION_CUSTOMER_INSERT = 'subscription_customer.insert';
     const SUBSCRIPTION_CUSTOMER_DELETE = 'subscription_customer.delete';
+    const SUBSCRIPTION_CUSTOMER_CANCEL = 'subscription_customer.cancel';
     const SUBSCRIPTION_CUSTOMER_SAVE = 'subscription_customer.save';
     const SUBSCRIPTION_CUSTOMER_EDIT_RETURN = 'subscription_customer.edit.return';
     const SUBSCRIPTION_CUSTOMER_NEW_RETURN = 'subscription_customer.new.return';

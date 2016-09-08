@@ -339,6 +339,32 @@ class SubscriptionCustomerController extends Controller
     }
 
     /**
+     * Cancels an existing Subscription entity.
+     *
+     * @Route("/{id}/cancel", name="cart_admin_subscription_customer_cancel")
+     * @Method("PUT")
+     */
+    public function cancelAction(Request $request, $id)
+    {
+        $entity = $this->get('cart.entity')->find($this->objectType, $id);
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Subscription entity.');
+        }
+
+        $event = new CoreEvent();
+        $event->setObjectType($this->objectType)
+            ->setEntity($entity)
+            ->setRequest($request);
+
+        $this->get('event_dispatcher')
+            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_CANCEL, $event);
+
+        return $event->getResponse()
+            ? $event->getResponse()
+            : $this->redirect($this->generateUrl('cart_admin_subscription_customer'));
+    }
+
+    /**
      * Deletes a Subscription entity.
      *
      * @Route("/{id}", name="cart_admin_subscription_customer_delete")
@@ -346,30 +372,22 @@ class SubscriptionCustomerController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-        //$form = $this->createDeleteForm($id);
-        //$form->handleRequest($request);
+        $entity = $this->get('cart.entity')->find($this->objectType, $id);
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Subscription entity.');
+        }
 
-        //if ($form->isValid()) {
-            $entity = $this->get('cart.entity')->find($this->objectType, $id);
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Subscription entity.');
-            }
+        $event = new CoreEvent();
+        $event->setObjectType($this->objectType)
+            ->setEntity($entity)
+            ->setRequest($request);
 
-            $event = new CoreEvent();
-            $event->setObjectType($this->objectType)
-                ->setEntity($entity)
-                ->setRequest($request);
+        $this->get('event_dispatcher')
+            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_DELETE, $event);
 
-            $this->get('event_dispatcher')
-                ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_DELETE, $event);
-
-            $request->getSession()->getFlashBag()->add(
-                'success',
-                'Subscription Successfully Deleted!'
-            );
-        //}
-
-        return $this->redirect($this->generateUrl('cart_admin_subscription_customer'));
+        return $event->getResponse()
+            ? $event->getResponse()
+            : $this->redirect($this->generateUrl('cart_admin_subscription_customer'));
     }
 
     /**

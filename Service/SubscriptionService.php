@@ -4,6 +4,7 @@ namespace MobileCart\SubscriptionBundle\Service;
 
 use MobileCart\CoreBundle\Constants\EntityConstants;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants as SubEntityConstants;
+use MobileCart\SubscriptionBundle\Entity\SubscriptionCustomer;
 
 class SubscriptionService
 {
@@ -73,60 +74,56 @@ class SubscriptionService
         return $this->paymentService;
     }
 
-    public function createFreeTrial($customerId, $subscriptionId, $startDate='now')
+    public function cancelRecurringSubscription(SubscriptionCustomer $subscriptionCustomer)
     {
-        $customer = $this->getEntityService()->find(EntityConstants::CUSTOMER, $customerId);
-        $subscription = $this->getEntityService()->find(SubEntityConstants::SUBSCRIPTION, $subscriptionId);
+        // cancel all future payments
 
+        $methodCode = $subscriptionCustomer->getSubscription()->getPaymentMethodCode();
+
+        $paymentMethodService = $this->getPaymentService()
+            ->findPaymentMethodServiceByCode($methodCode);
+
+        if (!$paymentMethodService) {
+            throw new \Exception("Cannot find Payment Method Service by code: {$methodCode}");
+        }
+
+        $success = false;
+
+        try {
+
+            $paymentMethodService->setSubscriptionCustomer($subscriptionCustomer)
+                ->cancelRecurring();
+
+            if ($paymentMethodService->getIsCanceledRecurring()) {
+                $subscriptionCustomer->setIsCanceled(true);
+                $this->getEntityService()->persist($subscriptionCustomer);
+                $success = true;
+            }
+
+        } catch(\Exception $e) {
+
+        }
+
+        return $success;
     }
 
-    public function updateFreeTrials($date='now')
+    public function sendReminderEmails($date='now')
     {
-
+        // todo
+        // send each customer a payment reminder
     }
 
-    public function updateOverdueSubscriptions()
+    public function processScheduledPayments($date='now')
     {
-
+        // todo
+        // attempt payment on all payments scheduled for today, with is_approved=0 and retries=0 or null
+        // if payment fails, mark as overdue
+        // else set is_approved=1 , and send an email receipt , schedule the next payment
     }
 
-    public function sendPaymentReminders()
+    public function updateOverdueSubscriptions($date='now')
     {
-
-    }
-
-    public function retryScheduledPayments()
-    {
-
-    }
-
-    public function fingerprintExists($fingerprint, $subscriptionId=0)
-    {
-        //check if a card has already been used, possibly for a free trial
-    }
-
-    public function captureScheduledPayments($date='now', $subscriptionId=0)
-    {
-        //specify a date . default is today
-        //specify a subscription or charge all subscriptions
-        // only capture scheduled payments with a status of approved=0
-        //retry scheduled payments
-        //schedule the next payment
-    }
-
-    public function buildCart($customer, $subscription)
-    {
-
-    }
-
-    public function submitCart($cart)
-    {
-
-    }
-
-    public function cancelCustomerSubscription($customerId, $subscriptionId)
-    {
-        //cancel all future payments
-        //mark subscription as in_active
+        // todo
+        // get overdue customers and retry payment and/or delete subscription
     }
 }

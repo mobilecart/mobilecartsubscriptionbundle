@@ -94,6 +94,13 @@ class SubscriptionPayment
     private $is_approved;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="retries", type="integer", nullable=true)
+     */
+    private $retries;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -416,5 +423,23 @@ class SubscriptionPayment
     public function getIsApproved()
     {
         return $this->is_approved;
+    }
+
+    /**
+     * @param $retries
+     * @return $this
+     */
+    public function setRetries($retries)
+    {
+        $this->retries = $retries;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRetries()
+    {
+        return $this->retries;
     }
 }

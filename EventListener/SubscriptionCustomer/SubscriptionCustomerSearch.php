@@ -37,6 +37,8 @@ class SubscriptionCustomerSearch
             ->parseRequest($event->getRequest())
             ->addJoin('inner', EntityConstants::CUSTOMER, 'id', 'customer_id')
             ->addColumn(EntityConstants::CUSTOMER . '.email')
+            ->addJoin('left', EntityConstants::CUSTOMER_TOKEN, 'id', 'customer_token_id')
+            ->addColumn(EntityConstants::CUSTOMER_TOKEN . '.service_account_id')
             ;
 
         $returnData['search'] = $search;

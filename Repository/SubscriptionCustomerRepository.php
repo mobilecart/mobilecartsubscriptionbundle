@@ -34,6 +34,7 @@ class SubscriptionCustomerRepository
             'email' => 'Email', // including customer.email because we join tables in SubscriptionCustomerSearch
             'parent_subscription_customer_id' => 'Parent Subscription',
             'created_at' => 'Created At',
+            'service_account_id' => 'Service Account', // we join tables in SubscriptionCustomerSearch
         ];
     }
 
@@ -58,6 +59,12 @@ class SubscriptionCustomerRepository
                 'label' => 'Parent Subscription',
                 'type'  => 'number',
             ],
+            [
+                'code'  => 'service_account_id',
+                'label' => 'Service Account',
+                'type'  => 'string',
+                'table' => 'customer_token'
+            ],
         ];
     }
 
@@ -66,7 +73,17 @@ class SubscriptionCustomerRepository
      */
     public function getSearchField()
     {
-        return 'customer_name';
+        return [
+            'customer_name',
+            [
+                'table' => 'customer_token', // we join tables in SubscriptionCustomerSearch
+                'column' => 'service_account_id',
+            ],
+            [
+                'table' => 'customer',
+                'column' => 'email', // we join tables in SubscriptionCustomerSearch
+            ],
+        ];
     }
 
     /**

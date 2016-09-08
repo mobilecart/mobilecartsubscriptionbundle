@@ -106,6 +106,11 @@ class SubscriptionCustomerList
                 'label' => 'Created At',
                 'sort' => 1,
             ],
+            [
+                'key' => 'service_account_id',
+                'label' => 'Account',
+                'sort' => 1,
+            ],
         ];
 
         switch($format) {

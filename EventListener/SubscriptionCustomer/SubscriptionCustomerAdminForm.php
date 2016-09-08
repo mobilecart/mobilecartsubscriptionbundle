@@ -90,7 +90,7 @@ class SubscriptionCustomerAdminForm
                     'parent_subscription_customer',
                     'customer',
                     'customer_name',
-                    'customer_token',
+                    //'customer_token',
                     'is_active',
                     'is_in_free_trial',
                     'is_overdue',
