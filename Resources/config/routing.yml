@@ -68,6 +68,11 @@ cart_admin_subscription_customer_update:
     defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:update' }
     methods: [PUT]
 
+cart_admin_subscription_customer_cancel:
+    path: '/admin/subscription_customer/{id}/cancel'
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:cancel' }
+    methods: [PUT]
+
 cart_admin_subscription_customer_delete:
     path: '/admin/subscription_customer/{id}'
     defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\SubscriptionCustomer:delete' }
