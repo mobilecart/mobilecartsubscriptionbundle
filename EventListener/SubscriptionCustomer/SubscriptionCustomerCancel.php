@@ -13,6 +13,8 @@ class SubscriptionCustomerCancel
 
     protected $event;
 
+    protected $router;
+
     protected function setEvent($event)
     {
         $this->event = $event;
@@ -29,6 +31,17 @@ class SubscriptionCustomerCancel
         return $this->getEvent()->getReturnData()
             ? $this->getEvent()->getReturnData()
             : [];
+    }
+
+    public function setRouter($router)
+    {
+        $this->router = $router;
+        return $this;
+    }
+
+    public function getRouter()
+    {
+        return $this->router;
     }
 
     public function setSubscriptionService($subscriptionService)
@@ -51,5 +64,8 @@ class SubscriptionCustomerCancel
                 'Subscription Successfully Canceled!'
             );
         }
+
+        $response = new RedirectResponse($this->getRouter()->generate('cart_admin_subscription_customer', []));
+        $event->setResponse($response);
     }
 }

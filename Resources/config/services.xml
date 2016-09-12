@@ -295,6 +295,9 @@
             <call method="setSubscriptionService">
                 <argument type="service" id="cart.subscription" />
             </call>
+            <call method="setRouter">
+                <argument type="service" id="router" />
+            </call>
         </service>
         <service id="cart.listener.subscription_customer.admin.form" lazy="true" class="%cart.listener.subscription_customer.admin.form.class%">
             <tag name="kernel.event_listener" event="subscription_customer.admin.form" method="onSubscriptionCustomerAdminForm" priority="50" />
