@@ -66,7 +66,7 @@ class SubscriptionCustomerAddPostReturn
         $response = '';
         $entity = $event->getEntity();
         $request = $event->getRequest();
-        $format = $request->get('format', '');
+        $format = $request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '');
         //$contentType = $request->headers->get('Accept');
 
         $params = [];

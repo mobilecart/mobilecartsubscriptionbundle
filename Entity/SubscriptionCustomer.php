@@ -153,7 +153,7 @@ class SubscriptionCustomer
         return $this->id;
     }
 
-    public function getObjectTypeName()
+    public function getObjectTypeKey()
     {
         return \MobileCart\SubscriptionBundle\Constants\EntityConstants::SUBSCRIPTION_CUSTOMER;
     }

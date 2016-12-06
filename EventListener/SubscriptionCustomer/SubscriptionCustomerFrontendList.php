@@ -74,7 +74,7 @@ class SubscriptionCustomerFrontendList
         $returnData = $this->getReturnData();
         $user = $returnData['user'];
         $request = $event->getRequest();
-        $format = $request->get('format', '');
+        $format = $request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '');
         $response = '';
 
         $entities = [];
