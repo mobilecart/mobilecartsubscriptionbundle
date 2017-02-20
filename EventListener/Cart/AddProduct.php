@@ -60,6 +60,10 @@ class AddProduct
     {
         $this->setEvent($event);
         $returnData = $this->getReturnData();
+        if (!isset($returnData['cart'])) {
+            return;
+        }
+
         $cart = $returnData['cart'];
         $request = $event->getRequest();
         $format = $request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '');
