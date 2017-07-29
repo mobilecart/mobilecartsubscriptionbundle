@@ -20,7 +20,7 @@ class FrontendExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'isSubscribed' => new \Twig_Function_Method($this, 'getIsSubscribed', ['is_safe' => ['html']]),
+            'isSubscribed' => new \Twig_SimpleFunction('isSubscribed', [$this, 'getIsSubscribed'], ['is_safe' => ['html']]),
         ];
     }
 
