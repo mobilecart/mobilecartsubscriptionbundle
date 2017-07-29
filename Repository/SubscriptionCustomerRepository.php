@@ -24,6 +24,14 @@ class SubscriptionCustomerRepository
     }
 
     /**
+     * @return bool
+     */
+    public function hasImages()
+    {
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function getSortableFields()

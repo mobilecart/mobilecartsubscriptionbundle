@@ -24,6 +24,14 @@ class SubscriptionRepository
     }
 
     /**
+     * @return bool
+     */
+    public function hasImages()
+    {
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function getSortableFields()
@@ -68,5 +76,4 @@ class SubscriptionRepository
     {
         return self::SEARCH_METHOD_LIKE;
     }
-
 }

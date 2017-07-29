@@ -6,46 +6,57 @@ use \Doctrine\Common\Collections\Collection;
 
 class RecursiveSubscriptionCustomerIterator implements \RecursiveIterator
 {
-
-    private $_data;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $data;
 
     public function __construct(Collection $data)
     {
-        $this->_data = $data;
+        $this->data = $data;
     }
 
+    /**
+     * @return bool
+     */
     public function hasChildren()
     {
-        return (!$this->_data->current()->getChildSubscriptionCustomers()->isEmpty());
+        return (!$this->data->current()->getChildSubscriptionCustomers()->isEmpty());
     }
 
+    /**
+     * @return RecursiveSubscriptionCustomerIterator|\RecursiveIterator
+     */
     public function getChildren()
     {
-        return new RecursiveSubscriptionCustomerIterator($this->_data->current()->getChildSubscriptionCustomers());
+        return new RecursiveSubscriptionCustomerIterator($this->data->current()->getChildSubscriptionCustomers());
     }
 
     public function current()
     {
-        return $this->_data->current();
+        return $this->data->current();
     }
 
     public function next()
     {
-        $this->_data->next();
+        $this->data->next();
     }
 
     public function key()
     {
-        return $this->_data->key();
+        return $this->data->key();
     }
 
+    /**
+     * @return bool
+     */
     public function valid()
     {
-        return $this->_data->current() instanceof SubscriptionCustomer;
+        return $this->data->current() instanceof SubscriptionCustomer;
     }
 
     public function rewind()
     {
-        $this->_data->first();
+        $this->data->first();
     }
 }
