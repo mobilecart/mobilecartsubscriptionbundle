@@ -19,17 +19,11 @@ class SubscriptionSearch
         return $this->event;
     }
 
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
     public function onSubscriptionSearch(Event $event)
     {
         $this->setEvent($event);
-        $returnData = $this->getReturnData();
+        $returnData = $event->getReturnData();
+        $request = $event->getRequest();
 
         $search = $event->getSearch()
             ->setObjectType($event->getObjectType()) // Important: set this first
@@ -39,5 +33,10 @@ class SubscriptionSearch
         $returnData['result'] = $search->search();
 
         $event->setReturnData($returnData);
+
+        if (in_array($search->getFormat(), ['', 'html'])) {
+            // for storing the last grid filters in the url ; used in back links
+            $request->getSession()->set('cart_admin_subscription', $request->getQueryString());
+        }
     }
 }
