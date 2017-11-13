@@ -2,53 +2,40 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\Subscription;
 
-use Symfony\Component\EventDispatcher\Event;
-use MobileCart\SubscriptionBundle\Constants\EntityConstants;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionDelete
+ * @package MobileCart\SubscriptionBundle\EventListener\Subscription
+ */
 class SubscriptionDelete
 {
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function onSubscriptionDelete(Event $event)
+    public function onSubscriptionDelete(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
         $entity = $event->getEntity();
-        $this->getEntityService()->remove($entity, EntityConstants::SUBSCRIPTION);
-
-        $event->setReturnData($returnData);
+        $this->getEntityService()->remove($entity);
     }
 }

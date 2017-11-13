@@ -2,69 +2,67 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\Subscription;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionList
+ * @package MobileCart\SubscriptionBundle\EventListener\Subscription
+ */
 class SubscriptionList
 {
-
+    /**
+     * @var \Symfony\Component\Routing\RouterInterface
+     */
     protected $router;
 
+    /**
+     * @var \MobileCart\CoreBundle\Service\ThemeService
+     */
     protected $themeService;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setThemeService($themeService)
-    {
-        $this->themeService = $themeService;
-        return $this;
-    }
-
-    public function getThemeService()
-    {
-        return $this->themeService;
-    }
-
-    public function setRouter($router)
+    /**
+     * @param \Symfony\Component\Routing\RouterInterface $router
+     * @return $this
+     */
+    public function setRouter(\Symfony\Component\Routing\RouterInterface $router)
     {
         $this->router = $router;
         return $this;
     }
 
+    /**
+     * @return \Symfony\Component\Routing\RouterInterface
+     */
     public function getRouter()
     {
         return $this->router;
     }
 
-    public function onSubscriptionList(Event $event)
+    /**
+     * @param \MobileCart\CoreBundle\Service\ThemeService $themeService
+     * @return $this
+     */
+    public function setThemeService(\MobileCart\CoreBundle\Service\ThemeService $themeService)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
+        $this->themeService = $themeService;
+        return $this;
+    }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\ThemeService
+     */
+    public function getThemeService()
+    {
+        return $this->themeService;
+    }
+
+    public function onSubscriptionList(CoreEvent $event)
+    {
         $request = $event->getRequest();
         $format = $request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '');
-        $response = '';
 
-        $returnData['mass_actions'] =
-        [
+        $event->setReturnData('mass_actions', [
             [
                 'label'         => 'Delete Subscriptions',
                 'input_label'   => 'Confirm Mass-Delete ?',
@@ -77,43 +75,37 @@ class SubscriptionList
                 'url' => $this->getRouter()->generate('cart_admin_subscription_mass_delete'),
                 'external' => 0,
             ],
-        ];
+        ]);
 
-        $returnData['columns'] =
-        [
+        $event->setReturnData('columns', [
             [
                 'key' => 'id',
                 'label' => 'ID',
-                'sort' => 1,
+                'sort' => true,
             ],
             [
                 'key' => 'name',
                 'label' => 'Name',
-                'sort' => 1,
+                'sort' => true,
             ],
             [
                 'key' => 'payment_amount',
                 'label' => 'Payment Amount',
-                'sort' => 1,
+                'sort' => true,
             ],
-        ];
+        ]);
 
         switch($format) {
             case 'json':
-                $response = new JsonResponse($returnData);
+                $event->setResponse(new JsonResponse($event->getReturnData()));
                 break;
-            //case 'xml':
-            //
-            //    break;
             default:
-
-                $response = $this->getThemeService()
-                    ->render('subscription_admin', 'Subscription:index.html.twig', $returnData);
-
+                $event->setResponse($this->getThemeService()->render(
+                    'subscription_admin',
+                    'Subscription:index.html.twig',
+                    $event->getReturnData()
+                ));
                 break;
         }
-
-        $event->setReturnData($returnData);
-        $event->setResponse($response);
     }
 }

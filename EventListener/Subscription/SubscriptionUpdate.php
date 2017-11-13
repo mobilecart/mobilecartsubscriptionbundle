@@ -2,56 +2,40 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\Subscription;
 
-use Symfony\Component\EventDispatcher\Event;
-use MobileCart\CoreBundle\Constants\EntityConstants;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionUpdate
+ * @package MobileCart\SubscriptionBundle\EventListener\Subscription
+ */
 class SubscriptionUpdate
 {
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function onSubscriptionUpdate(Event $event)
+    public function onSubscriptionUpdate(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
         $entity = $event->getEntity();
-        $formData = $event->getFormData();
-        $request = $event->getRequest();
-
         $this->getEntityService()->persist($entity);
-
-        $event->setReturnData($returnData);
     }
 }
