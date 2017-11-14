@@ -6,7 +6,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
+/**
+ * Class SubscriptionCustomerFrontendType
+ * @package MobileCart\SubscriptionBundle\Form
+ */
 class SubscriptionCustomerFrontendType extends AbstractType
 {
     /**
@@ -16,10 +21,10 @@ class SubscriptionCustomerFrontendType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('first_name', 'text')
-            ->add('last_name', 'text')
-            ->add('email', 'text',[
-                'required' => 1,
+            ->add('first_name', TextType::class)
+            ->add('last_name', TextType::class)
+            ->add('email', TextType::class,[
+                'required' => true,
                 'constraints' => [
                     new NotBlank(),
                 ],
@@ -33,14 +38,13 @@ class SubscriptionCustomerFrontendType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'MobileCart\CoreBundle\Entity\Customer',
+        $resolver->setDefaults([
             'csrf_protection' => false,
-        ));
+        ]);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
-        return 'customer';
+        return 'subscription_customer';
     }
 }

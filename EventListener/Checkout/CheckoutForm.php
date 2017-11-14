@@ -6,68 +6,57 @@ use MobileCart\CoreBundle\Payment\CollectPaymentMethodRequest;
 use MobileCart\CoreBundle\Payment\PaymentMethodServiceInterface;
 use MobileCart\SubscriptionBundle\Entity\Subscription;
 use Symfony\Component\EventDispatcher\Event;
+use MobileCart\CoreBundle\Event\CoreEvent;
 use MobileCart\CoreBundle\Constants\EntityConstants as CoreEntityConstants;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 
+/**
+ * Class CheckoutForm
+ * @package MobileCart\SubscriptionBundle\EventListener\Checkout
+ */
 class CheckoutForm
 {
-    protected $entityService;
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\CheckoutSessionService
+     */
     protected $checkoutSessionService;
 
-    protected $event;
-
-    public function setEntityService($entityService)
-    {
-        $this->entityService = $entityService;
-        return $this;
-    }
-
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
-        return $this->entityService;
+        return $this->getCheckoutSessionService()->getCartService()->getEntityService();
     }
 
-    public function setCheckoutSessionService($checkoutSession)
+    /**
+     * @param \MobileCart\CoreBundle\Service\CheckoutSessionService $checkoutSession
+     * @return $this
+     */
+    public function setCheckoutSessionService(\MobileCart\CoreBundle\Service\CheckoutSessionService $checkoutSession)
     {
         $this->checkoutSessionService = $checkoutSession;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\CheckoutSessionService
+     */
     public function getCheckoutSessionService()
     {
         return $this->checkoutSessionService;
     }
 
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    public function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function onCheckoutForm(Event $event)
+    public function onCheckoutForm(CoreEvent $event)
     {
         if ($event->getSingleStep()) {
             return false;
         }
 
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
+        $returnData = $event->getReturnData();
 
-        $cartSession = $this->getCheckoutSessionService()
-            ->getCartSessionService();
+        // Gather subscription items
+        $cartSession = $this->getCheckoutSessionService()->getCartService();
 
         $cart = $cartSession->getCart();
         if (!$cart) {
@@ -85,6 +74,7 @@ class CheckoutForm
             }
         }
 
+        // nothing to do without subscription items
         if (!$subItems) {
             return false;
         }
@@ -171,7 +161,7 @@ class CheckoutForm
                 $event->setExternalPlanId($extPlanId);
                 $paymentMethodRequest->setExternalPlanId($extPlanId);
                 $email = $this->getCheckoutSessionService()
-                    ->getCartSessionService()
+                    ->getCartService()
                     ->getCustomer()
                     ->getEmail();
 

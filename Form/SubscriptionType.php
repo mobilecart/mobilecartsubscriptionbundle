@@ -4,8 +4,17 @@ namespace MobileCart\SubscriptionBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
+/**
+ * Class SubscriptionType
+ * @package MobileCart\SubscriptionBundle\Form
+ */
 class SubscriptionType extends AbstractType
 {
     /**
@@ -15,10 +24,32 @@ class SubscriptionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
-            ->add('payment_amount')
-            ->add('payment_interval_days')
-            ->add('payment_handler')
+            ->add('name', TextType::class, [
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(),
+                ],
+            ])
+            ->add('payment_amount', TextType::class, [
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(),
+                ],
+            ])
+            ->add('payment_interval_days', NumberType::class, [
+                'required' => true,
+                'constraints' => [
+                    new GreaterThan(['value' => 0]),
+                    new NotBlank(),
+                ],
+            ])
+            ->add('payment_handler', IntegerType::class, [
+                'required' => true,
+                'constraints' => [
+                    new GreaterThan(['value' => 0]),
+                    new NotBlank(),
+                ],
+            ])
             ->add('payment_method_code')
             ->add('external_plan_id')
             ->add('free_trial_days')
@@ -29,14 +60,12 @@ class SubscriptionType extends AbstractType
             ->add('max_group_size')
         ;
     }
-    
+
     /**
-     * @param OptionsResolver $resolver
+     * @return string
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function getBlockPrefix()
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'MobileCart\SubscriptionBundle\Entity\Subscription'
-        ));
+        return 'subscription';
     }
 }

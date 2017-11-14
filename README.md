@@ -7,5 +7,8 @@ Update the Database, add new tables:
 
 $ ./app/console doctrine:schema:update
 
-Add html to your admin-layout.html.twig . copy/paste html from notes.txt
+Add a Variant with the code subscription_id to the Variant Set for Products.
+There is a CLI command also:
+
+$ ./app/console cart:sub:itemvars
 

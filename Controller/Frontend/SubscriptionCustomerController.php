@@ -11,42 +11,32 @@
 
 namespace MobileCart\SubscriptionBundle\Controller\Frontend;
 
-use MobileCart\SubscriptionBundle\Constants\EntityConstants;
-use MobileCart\CoreBundle\Constants\EntityConstants as CoreEntityConstants;
-
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
+use MobileCart\SubscriptionBundle\Constants\EntityConstants;
+use MobileCart\CoreBundle\Constants\EntityConstants as CoreEntityConstants;
 use MobileCart\CoreBundle\Event\CoreEvent;
 use MobileCart\SubscriptionBundle\Event\SubscriptionEvents;
 
+/**
+ * Class SubscriptionCustomerController
+ * @package MobileCart\SubscriptionBundle\Controller\Frontend
+ */
 class SubscriptionCustomerController extends Controller
 {
-
+    /**
+     * @var string
+     */
     protected $objectType = EntityConstants::SUBSCRIPTION_CUSTOMER;
 
-    /**
-     * @Route("/customer/subscription/shared", name="subscription_customers")
-     * @Method("GET")
-     */
     public function indexAction(Request $request)
     {
-        $user = $this->getUser();
-
-        $returnData = [
-            'user' => $user,
-        ];
-
         $event = new CoreEvent();
         $event->setObjectType($this->objectType)
             ->setRequest($request)
-            ->setReturnData($returnData)
+            ->setUser($this->getUser())
             ->setSection(CoreEvent::SECTION_FRONTEND);
 
         $this->get('event_dispatcher')
@@ -55,39 +45,19 @@ class SubscriptionCustomerController extends Controller
         return $event->getResponse();
     }
 
-    /**
-     * @Route("/customer/subscription/shared/add", name="subscription_customer_add")
-     * @Method("GET")
-     */
     public function addAction(Request $request)
     {
-        $user = $this->getUser();
-
-        $returnData = [
-            'user' => $user,
-        ];
-
-        $entity = $this->get('cart.entity')->getInstance(CoreEntityConstants::CUSTOMER);
-        $formEvent = new CoreEvent();
-        $formEvent->setObjectType($this->objectType)
-            ->setEntity($entity)
-            ->setRequest($request)
-            ->setReturnData($returnData)
-            ->setAction($this->generateUrl('subscription_customer_add_post'))
-            ->setMethod('POST');
-
-        $this->get('event_dispatcher')
-            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_FRONTEND_FORM, $formEvent);
-
-        $form = $formEvent->getForm();
-        $returnData = $formEvent->getReturnData();
-        $returnData['form'] = $form;
-
         $event = new CoreEvent();
         $event->setObjectType($this->objectType)
+            ->setSection(CoreEvent::SECTION_FRONTEND)
+            ->setEntity($this->get('cart.entity')->getInstance(CoreEntityConstants::CUSTOMER))
             ->setRequest($request)
-            ->setReturnData($returnData)
-            ->setSection(CoreEvent::SECTION_FRONTEND);
+            ->setUser($this->getUser())
+            ->setFormAction($this->generateUrl('subscription_customer_add_post'))
+            ->setFormMethod('POST');
+
+        $this->get('event_dispatcher')
+            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_FRONTEND_FORM, $event);
 
         $this->get('event_dispatcher')
             ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD_RETURN, $event);
@@ -95,64 +65,55 @@ class SubscriptionCustomerController extends Controller
         return $event->getResponse();
     }
 
-    /**
-     * @Route("/customer/subscription/shared/add", name="subscription_customer_add_post")
-     * @Method("POST")
-     */
     public function addPostAction(Request $request)
     {
-        $user = $this->getUser();
-
-        $returnData = [
-            'user' => $user,
-        ];
-
-        $entity = $this->get('cart.entity')->getInstance(CoreEntityConstants::CUSTOMER);
-        $formEvent = new CoreEvent();
-        $formEvent->setObjectType($this->objectType)
-            ->setEntity($entity)
+        $event = new CoreEvent();
+        $event->setObjectType($this->objectType)
+            ->setSection(CoreEvent::SECTION_FRONTEND)
+            ->setEntity($this->get('cart.entity')->getInstance(CoreEntityConstants::CUSTOMER))
             ->setRequest($request)
-            ->setReturnData($returnData)
-            ->setAction($this->generateUrl('subscription_customer_add_post'))
-            ->setMethod('POST');
+            ->setUser($this->getUser())
+            ->setFormAction($this->generateUrl('subscription_customer_add_post'))
+            ->setFormMethod('POST');
 
         $this->get('event_dispatcher')
-            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_FRONTEND_FORM, $formEvent);
+            ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_FRONTEND_FORM, $event);
 
-        $form = $formEvent->getForm();
-
+        $form = $event->getReturnData('form');
         if ($form->handleRequest($request)->isValid()) {
 
             $formData = $request->request->get($form->getName());
 
-            // observe event
-            //  add subscription to indexes, etc
-            $event = new CoreEvent();
-            $event->setEntity($entity)
-                ->setRequest($request)
-                ->setReturnData($formEvent->getReturnData())
-                ->setFormData($formData);
+            $event->setFormData($formData);
 
             $this->get('event_dispatcher')
                 ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD, $event);
 
-            $returnEvent = new CoreEvent();
-            $returnEvent->setMessages($event->getMessages())
-                ->setRequest($request)
-                ->setReturnData($event->getReturnData())
-                ->setEntity($entity);
-
             $this->get('event_dispatcher')
-                ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD_POST_RETURN, $returnEvent);
+                ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD_POST_RETURN, $event);
 
-            return $returnEvent->getResponse();
+            return $event->getResponse();
         }
 
-        $event = new CoreEvent();
-        $event->setObjectType($this->objectType)
-            ->setRequest($request)
-            ->setReturnData($returnData)
-            ->setSection(CoreEvent::SECTION_FRONTEND);
+        if ($request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '') == 'json') {
+
+            $invalid = [];
+            foreach($form->all() as $childKey => $child) {
+                $errors = $child->getErrors();
+                if ($errors->count()) {
+                    $invalid[$childKey] = [];
+                    foreach($errors as $error) {
+                        $invalid[$childKey][] = $error->getMessage();
+                    }
+                }
+            }
+
+            return new JsonResponse([
+                'success' => false,
+                'invalid' => $invalid,
+                'messages' => $event->getMessages()
+            ]);
+        }
 
         $this->get('event_dispatcher')
             ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD_RETURN, $event);
@@ -160,15 +121,13 @@ class SubscriptionCustomerController extends Controller
         return $event->getResponse();
     }
 
-    /**
-     * @Route("/customer/subscription/shared/add/success", name="subscription_customer_add_success")
-     * @Method("GET")
-     */
     public function addSuccessAction(Request $request)
     {
         $event = new CoreEvent();
         $event->setObjectType($this->objectType)
-            ->setRequest($request);
+            ->setSection(CoreEvent::SECTION_FRONTEND)
+            ->setRequest($request)
+            ->setUser($this->getUser());
 
         $this->get('event_dispatcher')
             ->dispatch(SubscriptionEvents::SUBSCRIPTION_CUSTOMER_ADD_SUCCESS, $event);
@@ -176,10 +135,6 @@ class SubscriptionCustomerController extends Controller
         return $event->getResponse();
     }
 
-    /**
-     * @Route("/customer/subscription/shared/remove", name="subscription_customer_remove")
-     * @Method("POST")
-     */
     public function removeAction(Request $request)
     {
         $customerId = $request->get('customer_id', 0);
@@ -205,7 +160,7 @@ class SubscriptionCustomerController extends Controller
 
         if ($request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '') == 'json') {
             return new JsonResponse([
-                'success' => 1,
+                'success' => true,
             ]);
         }
 

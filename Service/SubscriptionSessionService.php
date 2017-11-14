@@ -5,19 +5,41 @@ namespace MobileCart\SubscriptionBundle\Service;
 use MobileCart\CoreBundle\CartComponent\ArrayWrapper;
 use MobileCart\SubscriptionBundle\Entity\SubscriptionCustomer;
 
+/**
+ * Class SubscriptionSessionService
+ * @package MobileCart\SubscriptionBundle\Service
+ */
 class SubscriptionSessionService
 {
-    protected $cartSessionService;
+    /**
+     * @var \MobileCart\CoreBundle\Service\CartService
+     */
+    protected $cartService;
 
-    public function setCartSessionService($cartSessionService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\CartService $cartService
+     * @return $this
+     */
+    public function setCartService(\MobileCart\CoreBundle\Service\CartService $cartService)
     {
-        $this->cartSessionService = $cartSessionService;
+        $this->cartService = $cartService;
         return $this;
     }
 
-    public function getCartSessionService()
+    /**
+     * @return \MobileCart\CoreBundle\Service\CartService
+     */
+    public function getCartService()
     {
-        return $this->cartSessionService;
+        return $this->cartService;
+    }
+
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
+    public function getEntityService()
+    {
+        return $this->getCartService()->getEntityService();
     }
 
     /**
@@ -25,42 +47,41 @@ class SubscriptionSessionService
      */
     public function getIsSubscribed()
     {
-        if (!$this->getCartSessionService()->getCart()) {
+        if (!$this->getCartService()->getCart()) {
             return false;
         }
 
-        if (!$this->getCartSessionService()->getCart()->getCustomer()) {
+        if (!$this->getCartService()->getCart()->getCustomer()) {
             return false;
         }
 
-        if (!$this->getCartSessionService()->getCart()->getCustomer()->getSubscriptionCustomer()) {
+        if (!$this->getCartService()->getCart()->getCustomer()->getSubscriptionCustomer()) {
             return false;
         }
 
-        return $this->getCartSessionService()->getCart()->getCustomer()
+        return (bool) $this->getCartService()->getCart()->getCustomer()
             ->getSubscriptionCustomer()
             ->getIsActive();
     }
 
-
     public function getCalcIsInFreeTrial()
     {
-        if (!$this->getCartSessionService()->getCart()) {
+        if (!$this->getCartService()->getCart()) {
             return false;
         }
 
-        if (!$this->getCartSessionService()->getCart()->getCustomer()) {
+        if (!$this->getCartService()->getCart()->getCustomer()) {
             return false;
         }
 
-        if (!$this->getCartSessionService()->getCart()->getCustomer()->getSubscriptionCustomer()) {
+        if (!$this->getCartService()->getCart()->getCustomer()->getSubscriptionCustomer()) {
             return false;
         }
 
-        $subCustomer = $this->getCartSessionService()->getCart()->getCustomer()
+        $subCustomer = $this->getCartService()->getCart()->getCustomer()
             ->getSubscriptionCustomer();
 
-        $sub = $this->getCartSessionService()->getCart()->getCustomer()
+        $sub = $this->getCartService()->getCart()->getCustomer()
             ->getSubscription();
 
         if ($sub->getFreeTrialDays()) {
@@ -82,7 +103,7 @@ class SubscriptionSessionService
         $subCustomerData = new ArrayWrapper($subscriptionCustomer->getData());
         $subData = new ArrayWrapper($subscriptionCustomer->getSubscription()->getData());
 
-        $this->getCartSessionService()->getCart()->getCustomer()
+        $this->getCartService()->getCart()->getCustomer()
             ->set('subscription_customer', $subCustomerData)
             ->set('subscription', $subData);
 

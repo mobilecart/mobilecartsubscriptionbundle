@@ -27,18 +27,8 @@ class SubscriptionCustomerType extends AbstractType
             //->add('customer_token', 'text')
         ;
     }
-    
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'MobileCart\SubscriptionBundle\Entity\SubscriptionCustomer'
-        ));
-    }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'subscription_customer';
     }

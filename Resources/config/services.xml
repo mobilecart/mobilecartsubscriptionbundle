@@ -5,6 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
+        <parameter key="cart.form.type.subscription.class">MobileCart\SubscriptionBundle\Form\SubscriptionType</parameter>
+        <parameter key="cart.form.type.subscription_customer.class">MobileCart\SubscriptionBundle\Form\SubscriptionCustomerType</parameter>
+        <parameter key="cart.form.type.subscription_customer.frontend.class">MobileCart\SubscriptionBundle\Form\SubscriptionCustomerFrontendType</parameter>
         <parameter key="cart.listener.subscription.checkout.form.class">MobileCart\SubscriptionBundle\EventListener\Checkout\CheckoutForm</parameter>
         <parameter key="cart.listener.subscription.cart.add.product.class">MobileCart\SubscriptionBundle\EventListener\Cart\AddProduct</parameter>
         <parameter key="cart.listener.subscription.login.class">MobileCart\SubscriptionBundle\EventListener\Security\Login</parameter>
@@ -42,16 +45,23 @@
         <parameter key="cart.listener.subscription_customer.cancel.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerCancel</parameter>
         <parameter key="cart.listener.subscription_customer.admin.form.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerAdminForm</parameter>
         <parameter key="cart.listener.subscription_customer.frontend.form.class">MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer\SubscriptionCustomerFrontendForm</parameter>
+        <!-- Admin Menu Event Listener -->
+        <parameter key="cart.listener.subscription.admin.navigation.class">MobileCart\SubscriptionBundle\EventListener\Admin\AdminNavigation</parameter>
     </parameters>
 
     <services>
 
+        <!-- Admin Menu -->
+        <service id="cart.listener.subscription.admin.navigation" lazy="true" class="%cart.listener.subscription.admin.navigation.class%">
+            <tag name="kernel.event_listener" event="menu.build.admin_dashboard" method="onAdminNavigation" priority="40" />
+            <call method="setRouter">
+                <argument type="service" id="router"/>
+            </call>
+        </service>
+
         <!-- Order Success -->
         <service id="cart.subscription.order.submit.success" lazy="true" class="%cart.subscription.order.submit.success.class%">
             <tag name="kernel.event_listener" event="order.submit.success" method="onOrderSubmitSuccess" priority="50" />
-            <call method="setEntityService">
-                <argument type="service" id="cart.entity" />
-            </call>
             <call method="setSubscriptionSessionService">
                 <argument type="service" id="cart.subscription.session" />
             </call>
@@ -59,18 +69,14 @@
 
         <!-- Subscription Session -->
         <service id="cart.subscription.session" lazy="true" class="%cart.subscription.session.class%">
-            <call method="setCartSessionService">
-                <argument type="service" id="cart.session" />
+            <call method="setCartService">
+                <argument type="service" id="cart" />
             </call>
         </service>
 
         <!-- Twig Extension -->
         <service id="cart.twig.subscription.frontend" lazy="true" class="%cart.twig.subscription.frontend.class%">
-            <tag name="twig.extension" />
-            <call method="setSession">
-                <argument type="service" id="session" />
-            </call>
-            <call method="setSubscriptionSessionService">
+            <tag name="twig.extension" /><call method="setSubscriptionSessionService">
                 <argument type="service" id="cart.subscription.session" />
             </call>
         </service>
@@ -78,34 +84,27 @@
         <!-- Login Listener -->
         <service id="cart.listener.subscription.login" lazy="true" class="%cart.listener.subscription.login.class%">
             <tag name="kernel.event_listener" event="login.success" method="onLoginSuccess" priority="40" />
-            <call method="setCartSessionService">
-                <argument type="service" id="cart.session" />
-            </call>
-            <call method="setEntityService">
-                <argument type="service" id="cart.entity" />
+            <call method="setCartService">
+                <argument type="service" id="cart" />
             </call>
         </service>
 
         <!-- Event Listener: Checkout Form, configure subscription payment options -->
+        <!--
         <service id="cart.listener.subscription.checkout.form" lazy="true" class="%cart.listener.subscription.checkout.form.class%">
             <tag name="kernel.event_listener" event="checkout.form" method="onCheckoutForm" priority="55" />
             <call method="setCheckoutSessionService">
                 <argument type="service" id="cart.checkout.session" />
             </call>
-            <call method="setEntityService">
-                <argument type="service" id="cart.entity" />
-            </call>
         </service>
+        -->
 
-        <!-- Event Listener: Add Product to Cart : from a User Session, not for APIs -->
+        <!-- Event Listener: Add Product to Cart -->
         <service id="cart.listener.subscription.cart.add.product" lazy="true" class="%cart.listener.subscription.cart.add.product.class%">
             <tag name="kernel.event_listener" event="cart.add.product" method="onCartAddProduct" priority="40" />
             <tag name="kernel.event_listener" event="cart.add.discount" method="onCartAddProduct" priority="40" />
-            <call method="setEntityService">
-                <argument type="service" id="cart.entity" />
-            </call>
-            <call method="setCartSessionService">
-                <argument type="service" id="cart.session" />
+            <call method="setCartService">
+                <argument type="service" id="cart" />
             </call>
         </service>
 
@@ -113,9 +112,6 @@
         <service id="cart.subscription" lazy="true" class="%cart.subscription.class%">
             <call method="setIsEnabled">
                 <argument type="string">%cart.subscription.enabled%</argument>
-            </call>
-            <call method="setEntityService">
-                <argument type="service" id="cart.entity" />
             </call>
             <call method="setOrderService">
                 <argument type="service" id="cart.order" />
@@ -131,9 +127,13 @@
         <!-- Subscription Event Listeners -->
         <service id="cart.listener.subscription.search" lazy="true" class="%cart.listener.subscription.search.class%">
             <tag name="kernel.event_listener" event="subscription.search" method="onSubscriptionSearch" priority="50" />
+            <call method="setSearch">
+                <argument type="service" id="cart.search.admin" />
+                <argument type="string">subscription</argument>
+            </call>
         </service>
         <service id="cart.listener.subscription.list" lazy="true" class="%cart.listener.subscription.list.class%">
-            <tag name="kernel.event_listener" event="subscription.list" method="onSubscriptionList" priority="50" />
+            <tag name="kernel.event_listener" event="subscription.search" method="onSubscriptionList" priority="40" />
             <call method="setRouter">
                 <argument type="service" id="router"/>
             </call>
@@ -146,9 +146,6 @@
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
             </call>
-            <call method="setImageService">
-                <argument type="service" id="cart.image" />
-            </call>
             <call method="setThemeService">
                 <argument type="service" id="cart.theme"/>
             </call>
@@ -158,27 +155,18 @@
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
             </call>
-            <call method="setImageService">
-                <argument type="service" id="cart.image" />
-            </call>
             <call method="setThemeService">
                 <argument type="service" id="cart.theme"/>
             </call>
         </service>
         <service id="cart.listener.subscription.create.return" lazy="true" class="%cart.listener.subscription.create.return.class%">
             <tag name="kernel.event_listener" event="subscription.create.return" method="onSubscriptionCreateReturn" priority="50" />
-            <call method="setSession">
-                <argument type="service" id="session" />
-            </call>
             <call method="setRouter">
                 <argument type="service" id="router" />
             </call>
         </service>
         <service id="cart.listener.subscription.update.return" lazy="true" class="%cart.listener.subscription.update.return.class%">
             <tag name="kernel.event_listener" event="subscription.update.return" method="onSubscriptionUpdateReturn" priority="50" />
-            <call method="setSession">
-                <argument type="service" id="session" />
-            </call>
             <call method="setRouter">
                 <argument type="service" id="router" />
             </call>
@@ -209,6 +197,9 @@
             <call method="setFormFactory">
                 <argument type="service" id="form.factory" />
             </call>
+            <call method="setFormTypeClass">
+                <argument type="string">%cart.form.type.subscription.class%</argument>
+            </call>
             <call method="setThemeConfig">
                 <argument type="service" id="cart.theme.config" />
             </call>
@@ -217,9 +208,13 @@
         <!-- Subscription Customer Event Listeners -->
         <service id="cart.listener.subscription_customer.search" lazy="true" class="%cart.listener.subscription_customer.search.class%">
             <tag name="kernel.event_listener" event="subscription_customer.search" method="onSubscriptionCustomerSearch" priority="50" />
+            <call method="setSearch">
+                <argument type="service" id="cart.search.admin" />
+                <argument type="string">subscription_customer</argument>
+            </call>
         </service>
         <service id="cart.listener.subscription_customer.list" lazy="true" class="%cart.listener.subscription_customer.list.class%">
-            <tag name="kernel.event_listener" event="subscription_customer.list" method="onSubscriptionCustomerList" priority="50" />
+            <tag name="kernel.event_listener" event="subscription_customer.search" method="onSubscriptionCustomerList" priority="40" />
             <call method="setRouter">
                 <argument type="service" id="router"/>
             </call>
@@ -232,9 +227,6 @@
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
             </call>
-            <call method="setImageService">
-                <argument type="service" id="cart.image" />
-            </call>
             <call method="setThemeService">
                 <argument type="service" id="cart.theme"/>
             </call>
@@ -244,27 +236,18 @@
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
             </call>
-            <call method="setImageService">
-                <argument type="service" id="cart.image" />
-            </call>
             <call method="setThemeService">
                 <argument type="service" id="cart.theme"/>
             </call>
         </service>
         <service id="cart.listener.subscription_customer.create.return" lazy="true" class="%cart.listener.subscription_customer.create.return.class%">
             <tag name="kernel.event_listener" event="subscription_customer.create.return" method="onSubscriptionCustomerCreateReturn" priority="50" />
-            <call method="setSession">
-                <argument type="service" id="session" />
-            </call>
             <call method="setRouter">
                 <argument type="service" id="router" />
             </call>
         </service>
         <service id="cart.listener.subscription_customer.update.return" lazy="true" class="%cart.listener.subscription_customer.update.return.class%">
             <tag name="kernel.event_listener" event="subscription_customer.update.return" method="onSubscriptionCustomerUpdateReturn" priority="50" />
-            <call method="setSession">
-                <argument type="service" id="session" />
-            </call>
             <call method="setRouter">
                 <argument type="service" id="router" />
             </call>
@@ -307,6 +290,9 @@
             <call method="setFormFactory">
                 <argument type="service" id="form.factory" />
             </call>
+            <call method="setFormTypeClass">
+                <argument type="string">%cart.form.type.subscription_customer.class%</argument>
+            </call>
             <call method="setThemeConfig">
                 <argument type="service" id="cart.theme.config" />
             </call>
@@ -319,6 +305,9 @@
             <call method="setFormFactory">
                 <argument type="service" id="form.factory" />
             </call>
+            <call method="setFormTypeClass">
+                <argument type="string">%cart.form.type.subscription_customer.frontend.class%</argument>
+            </call>
             <call method="setThemeConfig">
                 <argument type="service" id="cart.theme.config" />
             </call>
@@ -327,9 +316,6 @@
             <tag name="kernel.event_listener" event="subscription_customer.add.return" method="onSubscriptionCustomerAddReturn" priority="50" />
             <call method="setEntityService">
                 <argument type="service" id="cart.entity" />
-            </call>
-            <call method="setImageService">
-                <argument type="service" id="cart.image" />
             </call>
             <call method="setThemeService">
                 <argument type="service" id="cart.theme"/>
@@ -355,9 +341,6 @@
         </service>
         <service id="cart.listener.subscription_customer.add.post.return" lazy="true" class="%cart.listener.subscription_customer.add.post.return.class%">
             <tag name="kernel.event_listener" event="subscription_customer.add.post.return" method="onSubscriptionCustomerAddPostReturn" priority="50" />
-            <call method="setSession">
-                <argument type="service" id="session" />
-            </call>
             <call method="setRouter">
                 <argument type="service" id="router" />
             </call>

@@ -2,69 +2,51 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\Security;
 
-use MobileCart\CoreBundle\CartComponent\ArrayWrapper;
-use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 use Symfony\Component\EventDispatcher\Event;
+use MobileCart\CoreBundle\CartComponent\ArrayWrapper;
+use MobileCart\CoreBundle\Event\CoreEvent;
+use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 
+/**
+ * Class Login
+ * @package MobileCart\SubscriptionBundle\EventListener\Security
+ */
 class Login
 {
-    protected $entityService;
+    /**
+     * @var \MobileCart\CoreBundle\Service\CartService
+     */
+    protected $cartService;
 
-    protected $cartSessionService;
-
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    public function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setEntityService($entityService)
-    {
-        $this->entityService = $entityService;
-        return $this;
-    }
-
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
-        return $this->entityService;
+        return $this->getCartService()->getEntityService();
     }
 
     /**
-     * @param $cartSessionService
+     * @param \MobileCart\CoreBundle\Service\CartService $cartService
      * @return $this
      */
-    public function setCartSessionService($cartSessionService)
+    public function setCartService(\MobileCart\CoreBundle\Service\CartService $cartService)
     {
-        $this->cartSessionService = $cartSessionService;
+        $this->cartService = $cartService;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return \MobileCart\CoreBundle\Service\CartService
      */
-    public function getCartSessionService()
+    public function getCartService()
     {
-        return $this->cartSessionService;
+        return $this->cartService;
     }
 
-    public function onLoginSuccess(Event $event)
+    public function onLoginSuccess(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
+        $returnData = $event->getReturnData();
 
         if ($event->getIsCustomer()) {
 
@@ -86,7 +68,7 @@ class Login
 
                 $event->setReturnData($returnData);
 
-                $this->getCartSessionService()->getCart()->getCustomer()
+                $this->getCartService()->getCart()->getCustomer()
                     ->set('subscription_customer', $subCustomerData)
                     ->set('subscription', $subData);
             }

@@ -1,3 +1,28 @@
+subscription_customers:
+    path: /customer/subscription/shared
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Frontend\SubscriptionCustomer:index' }
+    methods: [GET]
+
+subscription_customer_add:
+    path: /customer/subscription/shared/add
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Frontend\SubscriptionCustomer:add' }
+    methods: [GET]
+
+subscription_customer_add_post:
+    path: /customer/subscription/shared/add
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Frontend\SubscriptionCustomer:addPost' }
+    methods: [POST]
+
+subscription_customer_add_success:
+    path: /customer/subscription/shared/add/success
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Frontend\SubscriptionCustomer:addSuccess' }
+    methods: [GET]
+
+subscription_customer_remove:
+    path: /customer/subscription/remove
+    defaults: { _controller: 'MobileCartSubscriptionBundle:Frontend\SubscriptionCustomer:addPost' }
+    methods: [POST]
+
 cart_admin_subscription:
     path: /admin/subscription/
     defaults: { _controller: 'MobileCartSubscriptionBundle:Admin\Subscription:index' }
