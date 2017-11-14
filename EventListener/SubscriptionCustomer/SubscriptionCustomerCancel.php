@@ -2,62 +2,63 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use MobileCart\SubscriptionBundle\Constants\EntityConstants;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerCancel
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerCancel
 {
-
+    /**
+     * @var \MobileCart\SubscriptionBundle\Service\SubscriptionService
+     */
     protected $subscriptionService;
 
-    protected $event;
-
+    /**
+     * @var \Symfony\Component\Routing\RouterInterface
+     */
     protected $router;
 
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setRouter($router)
+    /**
+     * @param \Symfony\Component\Routing\RouterInterface $router
+     * @return $this
+     */
+    public function setRouter(\Symfony\Component\Routing\RouterInterface $router)
     {
         $this->router = $router;
         return $this;
     }
 
+    /**
+     * @return \Symfony\Component\Routing\RouterInterface
+     */
     public function getRouter()
     {
         return $this->router;
     }
 
-    public function setSubscriptionService($subscriptionService)
+    /**
+     * @param \MobileCart\SubscriptionBundle\Service\SubscriptionService $subscriptionService
+     * @return $this
+     */
+    public function setSubscriptionService(\MobileCart\SubscriptionBundle\Service\SubscriptionService $subscriptionService)
     {
         $this->subscriptionService = $subscriptionService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\SubscriptionBundle\Service\SubscriptionService
+     */
     public function getSubscriptionService()
     {
         return $this->subscriptionService;
     }
 
-    public function onSubscriptionCustomerCancel(Event $event)
+    public function onSubscriptionCustomerCancel(CoreEvent $event)
     {
-        $this->setEvent($event);
         if ($this->getSubscriptionService()->cancelRecurringSubscription($event->getEntity())) {
             $event->getRequest()->getSession()->getFlashBag()->add(
                 'success',
@@ -65,7 +66,9 @@ class SubscriptionCustomerCancel
             );
         }
 
-        $response = new RedirectResponse($this->getRouter()->generate('cart_admin_subscription_customer', []));
-        $event->setResponse($response);
+        $event->setResponse(new RedirectResponse($this->getRouter()->generate(
+            'cart_admin_subscription_customer',
+            []
+        )));
     }
 }

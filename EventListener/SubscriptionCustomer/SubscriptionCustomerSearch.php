@@ -5,15 +5,40 @@ namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 use MobileCart\CoreBundle\Constants\EntityConstants;
 use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerSearch
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerSearch
 {
     /**
-     * @param CoreEvent $event
+     * @var \MobileCart\CoreBundle\Service\SearchServiceInterface
      */
+    protected $search;
+
+    /**
+     * @param \MobileCart\CoreBundle\Service\SearchServiceInterface $search
+     * @param $objectType
+     * @return $this
+     */
+    public function setSearch(\MobileCart\CoreBundle\Service\SearchServiceInterface $search, $objectType)
+    {
+        $this->search = $search->setObjectType($objectType);
+        return $this;
+    }
+
+    /**
+     * @return \MobileCart\CoreBundle\Service\SearchServiceInterface
+     */
+    public function getSearch()
+    {
+        return $this->search;
+    }
+
     public function onSubscriptionCustomerSearch(CoreEvent $event)
     {
         $request = $event->getRequest();
-        $search = $event->getSearch()
+        $search = $this->getSearch()
             ->parseRequest($request)
             ->addJoin('inner', EntityConstants::CUSTOMER, 'id', 'customer_id')
             ->addColumn(EntityConstants::CUSTOMER . '.email')

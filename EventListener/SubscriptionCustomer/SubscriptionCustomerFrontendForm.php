@@ -2,86 +2,115 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
-use MobileCart\SubscriptionBundle\Form\SubscriptionCustomerFrontendType;
-use MobileCart\SubscriptionBundle\Constants\EntityConstants;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerFrontendForm
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerFrontendForm
 {
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
+    /**
+     * @var \Symfony\Component\Form\FormFactoryInterface
+     */
     protected $formFactory;
 
+    /**
+     * @var string
+     */
+    protected $formTypeClass = '';
+
+    /**
+     * @var \MobileCart\CoreBundle\Service\ThemeConfig
+     */
     protected $themeConfig;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function setFormFactory($formFactory)
+    /**
+     * @param \Symfony\Component\Form\FormFactoryInterface $formFactory
+     * @return $this
+     */
+    public function setFormFactory(\Symfony\Component\Form\FormFactoryInterface $formFactory)
     {
         $this->formFactory = $formFactory;
         return $this;
     }
 
+    /**
+     * @return \Symfony\Component\Form\FormFactoryInterface
+     */
     public function getFormFactory()
     {
         return $this->formFactory;
     }
 
-    public function setThemeConfig($themeConfig)
+    /**
+     * @param string $formTypeClass
+     * @return $this
+     */
+    public function setFormTypeClass($formTypeClass)
+    {
+        $this->formTypeClass = $formTypeClass;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormTypeClass()
+    {
+        return $this->formTypeClass;
+    }
+
+    /**
+     * @param \MobileCart\CoreBundle\Service\ThemeConfig $themeConfig
+     * @return $this
+     */
+    public function setThemeConfig(\MobileCart\CoreBundle\Service\ThemeConfig $themeConfig)
     {
         $this->themeConfig = $themeConfig;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\ThemeConfig
+     */
     public function getThemeConfig()
     {
         return $this->themeConfig;
     }
 
-    public function onSubscriptionCustomerFrontendForm(Event $event)
+    public function onSubscriptionCustomerFrontendForm(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
         $entity = $event->getEntity();
-
-        $formType = new SubscriptionCustomerFrontendType();
-
-        $form = $this->getFormFactory()->create($formType, $entity, [
-            'action' => $event->getAction(),
-            'method' => $event->getMethod(),
+        $form = $this->getFormFactory()->create($this->getFormTypeClass(), $entity, [
+            'action' => $event->getFormAction(),
+            'method' => $event->getFormMethod(),
         ]);
 
-        $formSections = [
+        $event->setReturnData('form_sections', [
             'general' => [
                 'label' => 'General',
                 'id' => 'general',
@@ -92,12 +121,8 @@ class SubscriptionCustomerFrontendForm
                     'billing_phone',
                 ],
             ],
-        ];
+        ]);
 
-        $returnData['form_sections'] = $formSections;
-        $returnData['form'] = $form;
-
-        $event->setForm($form)
-            ->setReturnData($returnData);
+        $event->setReturnData('form', $form);
     }
 }

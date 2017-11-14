@@ -2,101 +2,72 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerCreateReturn
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerCreateReturn
 {
+    /**
+     * @var \Symfony\Component\Routing\RouterInterface
+     */
     protected $router;
 
-    protected $session;
-
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setRouter($router)
+    /**
+     * @param \Symfony\Component\Routing\RouterInterface $router
+     * @return $this
+     */
+    public function setRouter(\Symfony\Component\Routing\RouterInterface $router)
     {
         $this->router = $router;
         return $this;
     }
 
+    /**
+     * @return \Symfony\Component\Routing\RouterInterface
+     */
     public function getRouter()
     {
         return $this->router;
     }
 
-    public function setSession($session)
+    public function onSubscriptionCustomerCreateReturn(CoreEvent $event)
     {
-        $this->session = $session;
-        return $this;
-    }
-
-    public function getSession()
-    {
-        return $this->session;
-    }
-
-    public function onSubscriptionCustomerCreateReturn(Event $event)
-    {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
-        $response = '';
-
         $entity = $event->getEntity();
         $request = $event->getRequest();
         $format = $request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '');
-        //$contentType = $request->headers->get('Accept');
 
         $params = ['id' => $entity->getId()];
         $route = 'cart_admin_subscription_customer_edit';
         $url = $this->getRouter()->generate($route, $params);
 
-        switch($format) {
-            case 'json':
-                $returnData = [
-                    'success' => 1,
-                    'entity' => $entity->getData(),
-                    'redirect_url' => $url,
-                ];
-                $response = new JsonResponse($returnData);
-                break;
-            //case 'xml':
-            //
-            //    break;
-            default:
-
-                if ($messages = $event->getMessages()) {
-                    foreach($messages as $code => $message) {
-                        $this->getSession()->getFlashBag()->add($code, $message);
-                    }
+        if ($event->getRequest()->getSession() && $event->getMessages()) {
+            foreach($event->getMessages() as $code => $messages) {
+                if (!$messages) {
+                    continue;
                 }
-
-                $response = new RedirectResponse($url);
-                break;
+                foreach($messages as $message) {
+                    $event->getRequest()->getSession()->getFlashBag()->add($code, $message);
+                }
+            }
         }
 
-        $event->setReturnData($returnData);
-        $event->setResponse($response);
+        switch($format) {
+            case 'json':
+                $event->setResponse(new JsonResponse([
+                    'success' => true,
+                    'entity' => $entity->getData(),
+                    'redirect_url' => $url,
+                ]));
+                break;
+            default:
+                $event->setResponse(new RedirectResponse($url));
+                break;
+        }
     }
 
 }

@@ -2,64 +2,64 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerDelete
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerDelete
 {
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
-    protected $event;
-
+    /**
+     * @var \Symfony\Component\Routing\RouterInterface
+     */
     protected $router;
 
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setRouter($router)
+    /**
+     * @param \Symfony\Component\Routing\RouterInterface $router
+     * @return $this
+     */
+    public function setRouter(\Symfony\Component\Routing\RouterInterface $router)
     {
         $this->router = $router;
         return $this;
     }
 
+    /**
+     * @return \Symfony\Component\Routing\RouterInterface
+     */
     public function getRouter()
     {
         return $this->router;
     }
 
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function onSubscriptionCustomerDelete(Event $event)
+    public function onSubscriptionCustomerDelete(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
         $entity = $event->getEntity();
         $this->getEntityService()->remove($entity, EntityConstants::SUBSCRIPTION_CUSTOMER);
 
@@ -68,9 +68,9 @@ class SubscriptionCustomerDelete
             'Subscription Successfully Deleted!'
         );
 
-        $response = new RedirectResponse($this->getRouter()->generate('cart_admin_subscription_customer', []));
-
-        $event->setReturnData($returnData)
-            ->setResponse($response);
+        $event->setResponse(new RedirectResponse($this->getRouter()->generate(
+            'cart_admin_subscription_customer',
+            []
+        )));
     }
 }

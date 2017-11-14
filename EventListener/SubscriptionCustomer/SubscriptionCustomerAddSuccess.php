@@ -2,104 +2,66 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerAddSuccess
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerAddSuccess
 {
-    protected $request;
-
-    protected $varSet;
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
-    protected $imageService;
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\ThemeService
+     */
     protected $themeService;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setThemeService($themeService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\ThemeService $themeService
+     * @return $this
+     */
+    public function setThemeService(\MobileCart\CoreBundle\Service\ThemeService $themeService)
     {
         $this->themeService = $themeService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\ThemeService
+     */
     public function getThemeService()
     {
         return $this->themeService;
     }
 
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function setImageService($imageService)
+    public function onSubscriptionCustomerAddSuccess(CoreEvent $event)
     {
-        $this->imageService = $imageService;
-        return $this;
-    }
-
-    public function getImageService()
-    {
-        return $this->imageService;
-    }
-
-    public function setRequest($request)
-    {
-        $this->request = $request;
-        return $this;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setVarSet($varSet)
-    {
-        $this->varSet = $varSet;
-        return $this;
-    }
-
-    public function getVarSet()
-    {
-        return $this->varSet;
-    }
-
-    public function onSubscriptionCustomerAddSuccess(Event $event)
-    {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
-        $response = $this->getThemeService()
-            ->render('subscription_frontend', 'SubscriptionCustomer:add_success.html.twig', $returnData);
-
-        $event->setResponse($response);
-        $event->setReturnData($returnData);
+        $event->setResponse($this->getThemeService()->render(
+            'subscription_frontend',
+            'SubscriptionCustomer:add_success.html.twig',
+            $event->getReturnData()
+        ));
     }
 }

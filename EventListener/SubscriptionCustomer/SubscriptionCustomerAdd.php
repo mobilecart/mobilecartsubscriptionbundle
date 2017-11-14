@@ -3,40 +3,34 @@
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
 use Symfony\Component\EventDispatcher\Event;
+use MobileCart\CoreBundle\Event\CoreEvent;
 use MobileCart\SubscriptionBundle\Constants\EntityConstants;
 use MobileCart\CoreBundle\Constants\EntityConstants as CoreEntityConstants;
 
+/**
+ * Class SubscriptionCustomerAdd
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerAdd
 {
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
+    /**
+     * @var \MobileCart\CoreBundle\Service\ThemeService
+     */
     protected $themeService;
-
-    protected $event;
 
     protected $mailer;
 
+    /**
+     * @var \Symfony\Component\Routing\RouterInterface
+     */
     protected $router;
 
     protected $passwordEncoder;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
 
     public function setMailer($mailer)
     {
@@ -49,12 +43,19 @@ class SubscriptionCustomerAdd
         return $this->mailer;
     }
 
-    public function setRouter($router)
+    /**
+     * @param \Symfony\Component\Routing\RouterInterface $router
+     * @return $this
+     */
+    public function setRouter(\Symfony\Component\Routing\RouterInterface $router)
     {
         $this->router = $router;
         return $this;
     }
 
+    /**
+     * @return \Symfony\Component\Routing\RouterInterface
+     */
     public function getRouter()
     {
         return $this->router;
@@ -71,39 +72,47 @@ class SubscriptionCustomerAdd
         return $this->passwordEncoder;
     }
 
-    public function setThemeService($themeService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\ThemeService $themeService
+     * @return $this
+     */
+    public function setThemeService(\MobileCart\CoreBundle\Service\ThemeService $themeService)
     {
         $this->themeService = $themeService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\ThemeService
+     */
     public function getThemeService()
     {
         return $this->themeService;
     }
 
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function onSubscriptionCustomerAdd(Event $event)
+    public function onSubscriptionCustomerAdd(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-        $returnData['success'] = 0;
-
-        $request = $event->getRequest();
+        $success = false;
         $entity = $event->getEntity();
-        $formData = $event->getFormData();
-
-        $parentCustomer = $returnData['user'];
+        $parentCustomer = $event->getReturnData('user');
 
         $parentSubscription = $this->getEntityService()->findOneBy(EntityConstants::SUBSCRIPTION_CUSTOMER, [
             'customer' => $parentCustomer->getId(),
@@ -113,8 +122,7 @@ class SubscriptionCustomerAdd
             ? $parentSubscription->getSubscription()
             : null;
 
-        if (
-            $subscription
+        if ($subscription
             && $subscription->getHasGroups()
             && count($parentSubscription->getChildren()) < $subscription->getMaxGroupSize()
         ) {
@@ -223,14 +231,10 @@ class SubscriptionCustomerAdd
                 }
             }
 
-            $returnData['success'] = 1;
-
-        } else {
-
-            // todo: add warning/error messages to the event
+            $success = true;
 
         }
 
-        $event->setReturnData($returnData);
+        $event->setReturnData('success', $success);
     }
 }

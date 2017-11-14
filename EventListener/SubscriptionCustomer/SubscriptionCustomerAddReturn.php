@@ -2,135 +2,70 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerAddReturn
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerAddReturn
 {
-    protected $request;
-
-    protected $varSet;
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     protected $entityService;
 
-    protected $imageService;
-
+    /**
+     * @var \MobileCart\CoreBundle\Service\ThemeService
+     */
     protected $themeService;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setThemeService($themeService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\ThemeService $themeService
+     * @return $this
+     */
+    public function setThemeService(\MobileCart\CoreBundle\Service\ThemeService $themeService)
     {
         $this->themeService = $themeService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\ThemeService
+     */
     public function getThemeService()
     {
         return $this->themeService;
     }
 
-    public function setEntityService($entityService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\AbstractEntityService $entityService
+     * @return $this
+     */
+    public function setEntityService(\MobileCart\CoreBundle\Service\AbstractEntityService $entityService)
     {
         $this->entityService = $entityService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\AbstractEntityService
+     */
     public function getEntityService()
     {
         return $this->entityService;
     }
 
-    public function setImageService($imageService)
+    public function onSubscriptionCustomerAddReturn(CoreEvent $event)
     {
-        $this->imageService = $imageService;
-        return $this;
-    }
+        $event->setReturnData('entity', $event->getEntity());
+        $event->setReturnData('form', $event->getReturnData('form')->createView());
+        $event->setReturnData('template_sections', []);
 
-    public function getImageService()
-    {
-        return $this->imageService;
-    }
-
-    public function setRequest($request)
-    {
-        $this->request = $request;
-        return $this;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setVarSet($varSet)
-    {
-        $this->varSet = $varSet;
-        return $this;
-    }
-
-    public function getVarSet()
-    {
-        return $this->varSet;
-    }
-
-    public function onSubscriptionCustomerAddReturn(Event $event)
-    {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-        $request = $event->getRequest();
-        $format = $request->get(\MobileCart\CoreBundle\Constants\ApiConstants::PARAM_RESPONSE_TYPE, '');
-
-        $entity = $event->getEntity();
-        $varSet = $this->getVarSet();
-        $objectType = $event->getObjectType();
-
-        switch($format) {
-            case 'json':
-                $response = new JsonResponse([
-                    'success' => 0,
-                ]);
-
-                $event->setResponse($response);
-                break;
-            default:
-
-                $typeSections = [];
-
-                $returnData['template_sections'] = $typeSections;
-
-                $form = $returnData['form'];
-                $returnData['form'] = $form->createView();
-                $returnData['entity'] = $entity;
-
-                $response = $this->getThemeService()
-                    ->render('subscription_frontend', 'SubscriptionCustomer:add.html.twig', $returnData);
-
-                $event->setResponse($response);
-
-                break;
-        }
-
-
-
-        $event->setReturnData($returnData);
+        $event->setResponse($this->getThemeService()->render(
+            'subscription_frontend',
+            'SubscriptionCustomer:add.html.twig',
+            $event->getReturnData()
+        ));
     }
 }

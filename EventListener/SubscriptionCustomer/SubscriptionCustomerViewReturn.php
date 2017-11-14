@@ -2,56 +2,47 @@
 
 namespace MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer;
 
-use Symfony\Component\EventDispatcher\Event;
+use MobileCart\CoreBundle\Event\CoreEvent;
 
+/**
+ * Class SubscriptionCustomerViewReturn
+ * @package MobileCart\SubscriptionBundle\EventListener\SubscriptionCustomer
+ */
 class SubscriptionCustomerViewReturn
 {
+    /**
+     * @var \MobileCart\CoreBundle\Service\ThemeService
+     */
     protected $themeService;
 
-    protected $event;
-
-    protected function setEvent($event)
-    {
-        $this->event = $event;
-        return $this;
-    }
-
-    protected function getEvent()
-    {
-        return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
-    }
-
-    public function setThemeService($themeService)
+    /**
+     * @param \MobileCart\CoreBundle\Service\ThemeService $themeService
+     * @return $this
+     */
+    public function setThemeService(\MobileCart\CoreBundle\Service\ThemeService $themeService)
     {
         $this->themeService = $themeService;
         return $this;
     }
 
+    /**
+     * @return \MobileCart\CoreBundle\Service\ThemeService
+     */
     public function getThemeService()
     {
         return $this->themeService;
     }
 
-    public function onSubscriptionCustomerViewReturn(Event $event)
+    public function onSubscriptionCustomerViewReturn(CoreEvent $event)
     {
-        $this->setEvent($event);
-        $returnData = $this->getReturnData();
-
         $template = $event->getEntity()->getCustomTemplate()
             ? $event->getEntity()->getCustomTemplate()
             : 'SubscriptionCustomer:view.html.twig';
 
-        $response = $this->getThemeService()
-            ->render('frontend', $template, $returnData);
-
-        $event->setReturnData($returnData);
-        $event->setResponse($response);
+        $event->setResponse($this->getThemeService()->render(
+            'frontend',
+            $template,
+            $event->getReturnData()
+        ));
     }
 }
